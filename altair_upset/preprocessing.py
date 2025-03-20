@@ -39,6 +39,14 @@ def preprocess_data(data, sets, abbre, sort_order):
     data = pd.melt(data, id_vars=["intersection_id", "count", "degree"])
     data = data.rename(columns={"variable": "set", "value": "is_intersect"})
 
+    # Create a column of concurrent groups (future update for better labelling)
+    # sets_mapping = (data.loc[data["is_intersect"] > 0].groupby("intersection_id")["set"]
+    #                 .apply(lambda x: " ".join(sorted(x))).to_dict())
+    #
+    # data["sets_graph"] = data.apply(
+    #     lambda row: row["set"] if row["is_intersect"] == 0 else sets_mapping.get(row["intersection_id"], ""),
+    #     axis=1).fillna("").astype(str)
+
     if abbre is None:
         abbre = sets
 
