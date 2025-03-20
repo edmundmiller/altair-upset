@@ -2,11 +2,71 @@ from typing import List, Optional, Union
 
 import altair as alt
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 
 from .components import create_horizontal_bar, create_matrix_view, create_vertical_bar
 from .config import upsetaltair_top_level_configuration
 from .preprocessing import preprocess_data
 from .transforms import create_base_chart
+
+colors_range_presets = ['Accent', 'Accent_r', 'Blues', 'Blues_r', 'BrBG', 'BrBG_r', 'BuGn', 'BuGn_r', 'BuPu', 'BuPu_r',
+                        'CMRmap', 'CMRmap_r', 'Dark2', 'Dark2_r', 'GnBu', 'GnBu_r', 'Grays', 'Grays_r', 'Greens',
+                        'Greens_r',
+                        'Greys', 'Greys_r', 'OrRd', 'OrRd_r', 'Oranges', 'Oranges_r', 'PRGn', 'PRGn_r', 'Paired',
+                        'Paired_r',
+                        'Pastel1', 'Pastel1_r', 'Pastel2', 'Pastel2_r', 'PiYG', 'PiYG_r', 'PuBu', 'PuBuGn', 'PuBuGn_r',
+                        'PuBu_r', 'PuOr', 'PuOr_r', 'PuRd', 'PuRd_r', 'Purples', 'Purples_r', 'RdBu', 'RdBu_r', 'RdGy',
+                        'RdGy_r', 'RdPu', 'RdPu_r', 'RdYlBu', 'RdYlBu_r', 'RdYlGn', 'RdYlGn_r', 'Reds', 'Reds_r',
+                        'Set1',
+                        'Set1_r', 'Set2', 'Set2_r', 'Set3', 'Set3_r', 'Spectral', 'Spectral_r', 'Wistia', 'Wistia_r',
+                        'YlGn',
+                        'YlGnBu', 'YlGnBu_r', 'YlGn_r', 'YlOrBr', 'YlOrBr_r', 'YlOrRd', 'YlOrRd_r', 'afmhot',
+                        'afmhot_r',
+                        'autumn', 'autumn_r', 'berlin', 'berlin_r', 'binary', 'binary_r', 'bone', 'bone_r', 'brg',
+                        'brg_r',
+                        'bwr', 'bwr_r', 'cividis', 'cividis_r', 'cool', 'cool_r', 'coolwarm', 'coolwarm_r', 'copper',
+                        'copper_r', 'cubehelix', 'cubehelix_r', 'flag', 'flag_r', 'gist_earth', 'gist_earth_r',
+                        'gist_gray',
+                        'gist_gray_r', 'gist_grey', 'gist_grey_r', 'gist_heat', 'gist_heat_r', 'gist_ncar',
+                        'gist_ncar_r',
+                        'gist_rainbow', 'gist_rainbow_r', 'gist_stern', 'gist_stern_r', 'gist_yarg', 'gist_yarg_r',
+                        'gist_yerg', 'gist_yerg_r', 'gnuplot', 'gnuplot2', 'gnuplot2_r', 'gnuplot_r', 'gray', 'gray_r',
+                        'grey', 'grey_r', 'hot', 'hot_r', 'hsv', 'hsv_r', 'inferno', 'inferno_r', 'jet', 'jet_r',
+                        'magma',
+                        'magma_r', 'managua', 'managua_r', 'nipy_spectral', 'nipy_spectral_r', 'ocean', 'ocean_r',
+                        'pink',
+                        'pink_r', 'plasma', 'plasma_r', 'prism', 'prism_r', 'rainbow', 'rainbow_r', 'seismic',
+                        'seismic_r',
+                        'spring', 'spring_r', 'summer', 'summer_r', 'tab10', 'tab10_r', 'tab20', 'tab20_r', 'tab20b',
+                        'tab20b_r', 'tab20c', 'tab20c_r', 'terrain', 'terrain_r', 'turbo', 'turbo_r', 'twilight',
+                        'twilight_r', 'twilight_shifted', 'twilight_shifted_r', 'vanimo', 'vanimo_r', 'viridis',
+                        'viridis_r',
+                        'winter', 'winter_r']
+
+colors_highlight_presets = ['aliceblue', 'antiquewhite', 'aqua', 'aquamarine', 'azure', 'beige', 'bisque', 'black',
+                            'blanchedalmond', 'blue', 'blueviolet', 'brown', 'burlywood', 'cadetblue', 'chartreuse',
+                            'chocolate', 'coral', 'cornflowerblue', 'cornsilk', 'crimson', 'cyan', 'darkblue',
+                            'darkcyan', 'darkgoldenrod', 'darkgray', 'darkgreen', 'darkgrey', 'darkkhaki',
+                            'darkmagenta', 'darkolivegreen', 'darkorange', 'darkorchid', 'darkred', 'darksalmon',
+                            'darkseagreen', 'darkslateblue', 'darkslategray', 'darkslategrey', 'darkturquoise',
+                            'darkviolet', 'deeppink', 'deepskyblue', 'dimgray', 'dimgrey', 'dodgerblue', 'firebrick',
+                            'floralwhite', 'forestgreen', 'fuchsia', 'gainsboro', 'ghostwhite', 'gold', 'goldenrod',
+                            'gray', 'green', 'greenyellow', 'grey', 'honeydew', 'hotpink', 'indianred', 'indigo',
+                            'ivory', 'khaki', 'lavender', 'lavenderblush', 'lawngreen', 'lemonchiffon', 'lightblue',
+                            'lightcoral', 'lightcyan', 'lightgoldenrodyellow', 'lightgray', 'lightgreen', 'lightgrey',
+                            'lightpink', 'lightsalmon', 'lightseagreen', 'lightskyblue', 'lightslategray',
+                            'lightslategrey', 'lightsteelblue', 'lightyellow', 'lime', 'limegreen', 'linen', 'magenta',
+                            'maroon', 'mediumaquamarine', 'mediumblue', 'mediumorchid', 'mediumpurple',
+                            'mediumseagreen', 'mediumslateblue', 'mediumspringgreen', 'mediumturquoise',
+                            'mediumvioletred', 'midnightblue', 'mintcream', 'mistyrose', 'moccasin', 'navajowhite',
+                            'navy', 'oldlace', 'olive', 'olivedrab', 'orange', 'orangered', 'orchid', 'palegoldenrod',
+                            'palegreen', 'paleturquoise', 'palevioletred', 'papayawhip', 'peachpuff', 'peru', 'pink',
+                            'plum', 'powderblue', 'purple', 'rebeccapurple', 'red', 'rosybrown', 'royalblue',
+                            'saddlebrown', 'salmon', 'sandybrown', 'seagreen', 'seashell', 'sienna', 'silver',
+                            'skyblue', 'slateblue', 'slategray', 'slategrey', 'snow', 'springgreen', 'steelblue',
+                            'tan', 'teal', 'thistle', 'tomato', 'turquoise', 'violet', 'wheat', 'white', 'whitesmoke',
+                            'yellow', 'yellowgreen']
 
 
 class UpSetChart:
@@ -63,33 +123,33 @@ class UpSetChart:
 
 
 def UpSetAltair(
-    data: pd.DataFrame,
-    sets: List[str],
-    *,
-    title: str = "",
-    subtitle: Union[str, List[str]] = "",
-    abbre: Optional[List[str]] = None,
-    sort_by: str = "frequency",
-    sort_order: str = "ascending",
-    width: int = 1200,
-    height: int = 700,
-    height_ratio: float = 0.6,
-    horizontal_bar_chart_width: Optional[int] = None,
-    color_range: List[str] = [
-        "#55A8DB",
-        "#3070B5",
-        "#30363F",
-        "#F1AD60",
-        "#DF6234",
-        "#BDC6CA",
-    ],
-    highlight_color: str = "#EA4667",
-    glyph_size: int = 100,  # Reduced from 200
-    set_label_bg_size: int = 500,  # Reduced from 1000
-    line_connection_size: int = 1,  # Reduced from 2
-    horizontal_bar_size: int = 20,
-    vertical_bar_label_size: int = 16,
-    theme: Optional[str] = None,
+        data: pd.DataFrame,
+        sets: List[str],
+        *,
+        title: str = "",
+        subtitle: Union[str, List[str]] = "",
+        abbre: Optional[List[str]] = None,
+        sort_by: str = "frequency",
+        sort_order: str = "ascending",
+        width: int = 1200,
+        height: int = 700,
+        height_ratio: float = 0.6,
+        horizontal_bar_chart_width: Optional[int] = None,
+        color_range: Union[str, List[str]] = [
+            "#55A8DB",
+            "#3070B5",
+            "#30363F",
+            "#F1AD60",
+            "#DF6234",
+            "#BDC6CA",
+        ],
+        highlight_color: str = "#EA4667",
+        glyph_size: int = 100,  # Reduced from 200
+        set_label_bg_size: int = 500,  # Reduced from 1000
+        line_connection_size: int = 1,  # Reduced from 2
+        horizontal_bar_size: int = 20,
+        vertical_bar_label_size: int = 16,
+        theme: Optional[str] = None,
 ) -> UpSetChart:
     """Generate interactive UpSet plots using Altair. [Lex et al., 2014]_
 
@@ -123,9 +183,338 @@ def UpSetAltair(
         Ratio of vertical bar chart height to total height (between 0 and 1).
     horizontal_bar_chart_width : int, default 300
         Width of the horizontal bar chart in pixels.
-    color_range : list of str
+    color_range : str or list of str
+        List of presets accepted in str:
+        - 'Accent'
+        - 'Accent_r''Blues'
+        - 'Blues_r'
+        - 'BrBG'
+        - 'BrBG_r'
+        - 'BuGn'
+        - 'BuGn_r'
+        - 'BuPu'
+        - 'BuPu_r'
+        - 'CMRmap'
+        - 'CMRmap_r'
+        - 'Dark2'
+        - 'Dark2_r'
+        - 'GnBu'
+        - 'GnBu_r'
+        - 'Grays'
+        - 'Grays_r'
+        - 'Greens'
+        - 'Greens_r'
+        - 'Greys'
+        - 'Greys_r'
+        - 'OrRd'
+        - 'OrRd_r'
+        - 'Oranges'
+        - 'Oranges_r'
+        - 'PRGn'
+        - 'PRGn_r'
+        - 'Paired'
+        - 'Paired_r'
+        - 'Pastel1'
+        - 'Pastel1_r'
+        - 'Pastel2'
+        - 'Pastel2_r'
+        - 'PiYG'
+        - 'PiYG_r'
+        - 'PuBu'
+        - 'PuBuGn'
+        - 'PuBuGn_r'
+        - 'PuBu_r'
+        - 'PuOr'
+        - 'PuOr_r'
+        - 'PuRd'
+        - 'PuRd_r'
+        - 'Purples'
+        - 'Purples_r'
+        - 'RdBu'
+        - 'RdBu_r'
+        - 'RdGy'
+        - 'RdGy_r'
+        - 'RdPu'
+        - 'RdPu_r'
+        - 'RdYlBu'
+        - 'RdYlBu_r'
+        - 'RdYlGn'
+        - 'RdYlGn_r'
+        - 'Reds'
+        - 'Reds_r'
+        - 'Set1'
+        - 'Set1_r'
+        - 'Set2'
+        - 'Set2_r'
+        - 'Set3'
+        - 'Set3_r'
+        - 'Spectral'
+        - 'Spectral_r'
+        - 'Wistia'
+        - 'Wistia_r'
+        - 'YlGn'
+        - 'YlGnBu'
+        - 'YlGnBu_r'
+        - 'YlGn_r'
+        - 'YlOrBr'
+        - 'YlOrBr_r'
+        - 'YlOrRd'
+        - 'YlOrRd_r'
+        - 'afmhot'
+        - 'afmhot_r'
+        - 'autumn'
+        - 'autumn_r'
+        - 'berlin'
+        - 'berlin_r'
+        - 'binary'
+        - 'binary_r'
+        - 'bone'
+        - 'bone_r'
+        - 'brg'
+        - 'brg_r'
+        - 'bwr'
+        - 'bwr_r'
+        - 'cividis'
+        - 'cividis_r'
+        - 'cool'
+        - 'cool_r'
+        - 'coolwarm'
+        - 'coolwarm_r'
+        - 'copper'
+        - 'copper_r'
+        - 'cubehelix'
+        - 'cubehelix_r'
+        - 'flag'
+        - 'flag_r'
+        - 'gist_earth'
+        - 'gist_earth_r'
+        - 'gist_gray'
+        - 'gist_gray_r'
+        - 'gist_grey'
+        - 'gist_grey_r'
+        - 'gist_heat'
+        - 'gist_heat_r'
+        - 'gist_ncar'
+        - 'gist_ncar_r'
+        - 'gist_rainbow'
+        - 'gist_rainbow_r'
+        - 'gist_stern'
+        - 'gist_stern_r'
+        - 'gist_yarg'
+        - 'gist_yarg_r'
+        - 'gist_yerg'
+        - 'gist_yerg_r'
+        - 'gnuplot'
+        - 'gnuplot2'
+        - 'gnuplot2_r'
+        - 'gnuplot_r'
+        - 'gray'
+        - 'gray_r'
+        - 'grey'
+        - 'grey_r'
+        - 'hot'
+        - 'hot_r'
+        - 'hsv'
+        - 'hsv_r'
+        - 'inferno'
+        - 'inferno_r'
+        - 'jet'
+        - 'jet_r'
+        - 'magma'
+        - 'magma_r'
+        - 'managua'
+        - 'managua_r'
+        - 'nipy_spectral'
+        - 'nipy_spectral_r'
+        - 'ocean'
+        - 'ocean_r'
+        - 'pink'
+        - 'pink_r'
+        - 'plasma'
+        - 'plasma_r'
+        - 'prism'
+        - 'prism_r'
+        - 'rainbow'
+        - 'rainbow_r'
+        - 'seismic'
+        - 'seismic_r'
+        - 'spring'
+        - 'spring_r'
+        - 'summer'
+        - 'summer_r'
+        - 'tab10'
+        - 'tab10_r'
+        - 'tab20'
+        - 'tab20_r'
+        - 'tab20b'
+        - 'tab20b_r'
+        - 'tab20c'
+        - 'tab20c_r'
+        - 'terrain'
+        - 'terrain_r'
+        - 'turbo'
+        - 'turbo_r'
+        - 'twilight'
+        - 'twilight_r'
+        - 'twilight_shifted'
+        - 'twilight_shifted_r'
+        - 'vanimo'
+        - 'vanimo_r'
+        - 'viridis'
+        - 'viridis_r'
+        - 'winter'
+        - 'winter_r'
         List of colors for the sets. Defaults to a colorblind-friendly palette.
     highlight_color : str, default "#EA4667"
+        List of presets accepted:
+        - aliceblue'
+        - 'antiquewhite'
+        - 'aqua'
+        - 'aquamarine'
+        - 'azure'
+        - 'beige'
+        - 'bisque'
+        - 'black'
+        - 'blanchedalmond'
+        - 'blue'
+        - 'blueviolet'
+        - 'brown'
+        - 'burlywood'
+        - 'cadetblue'
+        - 'chartreuse'
+        - 'chocolate'
+        - 'coral'
+        - 'cornflowerblue'
+        - 'cornsilk'
+        - 'crimson'
+        - 'cyan'
+        - 'darkblue'
+        - 'darkcyan'
+        - 'darkgoldenrod'
+        - 'darkgray'
+        - 'darkgreen'
+        - 'darkgrey'
+        - 'darkkhaki'
+        - 'darkmagenta'
+        - 'darkolivegreen'
+        - 'darkorange'
+        - 'darkorchid'
+        - 'darkred'
+        - 'darksalmon'
+        - 'darkseagreen'
+        - 'darkslateblue'
+        - 'darkslategray'
+        - 'darkslategrey'
+        - 'darkturquoise'
+        - 'darkviolet'
+        - 'deeppink'
+        - 'deepskyblue'
+        - 'dimgray'
+        - 'dimgrey'
+        - 'dodgerblue'
+        - 'firebrick'
+        - 'floralwhite'
+        - 'forestgreen'
+        - 'fuchsia'
+        - 'gainsboro'
+        - 'ghostwhite'
+        - 'gold'
+        - 'goldenrod'
+        - 'gray'
+        - 'green'
+        - 'greenyellow'
+        - 'grey'
+        - 'honeydew'
+        - 'hotpink'
+        - 'indianred'
+        - 'indigo'
+        - 'ivory'
+        - 'khaki'
+        - 'lavender'
+        - 'lavenderblush'
+        - 'lawngreen'
+        - 'lemonchiffon'
+        - 'lightblue'
+        - 'lightcoral'
+        - 'lightcyan'
+        - 'lightgoldenrodyellow'
+        - 'lightgray'
+        - 'lightgreen'
+        - 'lightgrey'
+        - 'lightpink'
+        - 'lightsalmon'
+        - 'lightseagreen'
+        - 'lightskyblue'
+        - 'lightslategray'
+        - 'lightslategrey'
+        - 'lightsteelblue'
+        - 'lightyellow'
+        - 'lime'
+        - 'limegreen'
+        - 'linen'
+        - 'magenta'
+        - 'maroon'
+        - 'mediumaquamarine'
+        - 'mediumblue'
+        - 'mediumorchid'
+        - 'mediumpurple'
+        - 'mediumseagreen'
+        - 'mediumslateblue'
+        - 'mediumspringgreen'
+        - 'mediumturquoise'
+        - 'mediumvioletred'
+        - 'midnightblue'
+        - 'mintcream'
+        - 'mistyrose'
+        - 'moccasin'
+        - 'navajowhite'
+        - 'navy'
+        - 'oldlace'
+        - 'olive'
+        - 'olivedrab'
+        - 'orange'
+        - 'orangered'
+        - 'orchid'
+        - 'palegoldenrod'
+        - 'palegreen'
+        - 'paleturquoise'
+        - 'palevioletred'
+        - 'papayawhip'
+        - 'peachpuff'
+        - 'peru'
+        - 'pink'
+        - 'plum'
+        - 'powderblue'
+        - 'purple'
+        - 'rebeccapurple'
+        - 'red'
+        - 'rosybrown'
+        - 'royalblue'
+        - 'saddlebrown'
+        - 'salmon'
+        - 'sandybrown'
+        - 'seagreen'
+        - 'seashell'
+        - 'sienna'
+        - 'silver'
+        - 'skyblue'
+        - 'slateblue'
+        - 'slategray'
+        - 'slategrey'
+        - 'snow'
+        - 'springgreen'
+        - 'steelblue'
+        - 'tan'
+        - 'teal'
+        - 'thistle'
+        - 'tomato'
+        - 'turquoise'
+        - 'violet'
+        - 'wheat'
+        - 'white'
+        - 'whitesmoke'
+        - 'yellow'
+        - 'yellowgreen'
         Color used for highlighting on hover.
     glyph_size : int, default 200
         Size of the matrix glyphs in pixels.
@@ -190,6 +579,23 @@ def UpSetAltair(
         raise ValueError("sort_order must be either 'ascending' or 'descending'")
     if abbre is not None and len(sets) != len(abbre):
         raise ValueError("if provided, abbre must have the same length as sets")
+
+    # Colors range presets
+    if isinstance(color_range, str):
+        try:
+            cmap = plt.get_cmap(color_range)
+            color_range = [mcolors.to_hex(cmap(i / (len(sets) - 1))) for i in range(len(sets))]
+        except ValueError:
+            print(ValueError("color_range must be one of {}".format(colors_range_presets)))
+            color_range = ["#55A8DB", "#3070B5", "#30363F", "#F1AD60", "#DF6234", "#BDC6CA"]
+
+    # Colors highlight presets
+    if not highlight_color.startswith("#"):
+        try:
+            mcolors.to_hex(mcolors.CSS4_COLORS.get(highlight_color, highlight_color))
+        except ValueError:
+            print(ValueError("highlight_color must be one of {}".format(colors_highlight_presets)))
+            highlight_color = "#EA4667"
 
     # Apply theme if specified
     if theme is not None:
