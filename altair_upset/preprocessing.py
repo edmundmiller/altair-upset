@@ -5,26 +5,27 @@ def preprocess_data(data, sets, abbre, sort_order):
     """Handles the data preprocessing for UpSet plots."""
     # Create a copy to avoid SettingWithCopyWarning
     data = data.copy()
-    
+
     # Handle empty input data
     if len(data) == 0:
         # Create empty result DataFrame with required columns
         data = pd.DataFrame(columns=sets + ["count", "intersection_id", "degree"])
         data = pd.melt(data, id_vars=["intersection_id", "count", "degree"])
         data = data.rename(columns={"variable": "set", "value": "is_intersect"})
-        
+
         if abbre is None:
             abbre = sets
-            
+
         set_to_abbre = pd.DataFrame(
-            [[sets[i], abbre[i]] for i in range(len(sets))], columns=["set", "set_abbre"]
+            [[sets[i], abbre[i]] for i in range(len(sets))],
+            columns=["set", "set_abbre"],
         )
         set_to_order = pd.DataFrame(
             [[sets[i], 1 + sets.index(sets[i])] for i in range(len(sets))],
             columns=["set", "set_order"],
         )
         return data, set_to_abbre, set_to_order, abbre
-    
+
     # Process non-empty data
     data.loc[:, "count"] = 0
     data = data[sets + ["count"]]

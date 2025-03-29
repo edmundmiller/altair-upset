@@ -81,15 +81,15 @@ def test_degree_calculation(sample_data, sample_sets, legend_selection):
         assert expected_term in formula, f"Formula should use {s} value"
 
     # Check basic formula structure
-    assert formula.count("?") == len(
-        sample_sets
-    ), "Should have one ternary operator per set"
-    assert formula.count(":") == len(
-        sample_sets
-    ), "Should have one ternary operator per set"
-    assert (
-        formula.count("+") == len(sample_sets) - 1
-    ), "Should have additions between all sets"
+    assert formula.count("?") == len(sample_sets), (
+        "Should have one ternary operator per set"
+    )
+    assert formula.count(":") == len(sample_sets), (
+        "Should have one ternary operator per set"
+    )
+    assert formula.count("+") == len(sample_sets) - 1, (
+        "Should have additions between all sets"
+    )
 
 
 def test_lookup_transforms(sample_data, sample_sets, legend_selection):

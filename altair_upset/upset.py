@@ -209,7 +209,9 @@ def UpSetAltair(
     if horizontal_bar_chart_width is None:
         horizontal_bar_chart_width = int(width * 0.15)  # Make it 25% of total width
     vertical_bar_chart_height = height * height_ratio
-    matrix_height = (height - vertical_bar_chart_height) * 0.8  # Reduce height to tighten spacing
+    matrix_height = (
+        height - vertical_bar_chart_height
+    ) * 0.8  # Reduce height to tighten spacing
     matrix_width = width - horizontal_bar_chart_width
 
     # Automatic padding

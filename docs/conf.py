@@ -9,9 +9,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.resolve()))
 
 # Project information
-project = 'altair-upset'
-copyright = f'2024-{datetime.now().year}, Edmund Miller'
-author = 'Edmund Miller'
+project = "altair-upset"
+copyright = f"2024-{datetime.now().year}, Edmund Miller"
+author = "Edmund Miller"
 
 # Extensions
 extensions = [
@@ -48,18 +48,18 @@ html_context = {
 
 # Intersphinx mapping
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3', None),
-    'altair': ('https://altair-viz.github.io/', None),
-    'pandas': ('https://pandas.pydata.org/docs/', None),
+    "python": ("https://docs.python.org/3", None),
+    "altair": ("https://altair-viz.github.io/", None),
+    "pandas": ("https://pandas.pydata.org/docs/", None),
 }
 
 # Paths and static files
-html_static_path = ['_static']  # Include _static directory
+html_static_path = ["_static"]  # Include _static directory
 html_css_files = [
-    'custom.css',
+    "custom.css",
 ]
-templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+templates_path = ["_templates"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # Numpydoc settings
 numpydoc_show_class_members = False
@@ -67,9 +67,9 @@ numpydoc_show_inherited_class_members = False
 numpydoc_class_members_toctree = False
 
 # Autodoc settings
-autodoc_default_flags = ['members', 'inherited-members']
-autodoc_member_order = 'groupwise'
-autodoc_typehints = 'none'
+autodoc_default_flags = ["members", "inherited-members"]
+autodoc_member_order = "groupwise"
+autodoc_typehints = "none"
 
 # Generate autosummary even if no references
 autosummary_generate = True
