@@ -36,7 +36,7 @@
   "params": [
     {
       "bind": "legend",
-      "name": "param_31",
+      "name": "param_1",
       "select": {
         "fields": [
           "set"
@@ -44,14 +44,14 @@
         "type": "point"
       },
       "views": [
-        "view_41",
-        "view_42",
-        "view_43",
-        "view_44"
+        "view_1",
+        "view_2",
+        "view_3",
+        "view_4"
       ]
     },
     {
-      "name": "param_32",
+      "name": "param_2",
       "select": {
         "fields": [
           "intersection_id"
@@ -60,8 +60,8 @@
         "type": "point"
       },
       "views": [
-        "view_41",
-        "view_42"
+        "view_1",
+        "view_2"
       ]
     }
   ],
@@ -134,7 +134,7 @@
             "size": 20,
             "type": "bar"
           },
-          "name": "view_44",
+          "name": "view_4",
           "transform": [
             {
               "aggregate": [
@@ -179,12 +179,12 @@
             },
             {
               "filter": {
-                "param": "param_31"
+                "param": "param_1"
               }
             },
             {
               "filter": {
-                "param": "param_31"
+                "param": "param_1"
               }
             },
             {
@@ -256,7 +256,7 @@
                   "condition": {
                     "test": {
                       "not": {
-                        "param": "param_32"
+                        "param": "param_2"
                       }
                     },
                     "value": "#3A3A3A"
@@ -265,7 +265,6 @@
                 },
                 "tooltip": [
                   {
-                    "aggregate": "max",
                     "field": "count",
                     "title": "Cardinality",
                     "type": "quantitative"
@@ -274,11 +273,6 @@
                     "field": "degree",
                     "title": "Degree",
                     "type": "quantitative"
-                  },
-                  {
-                    "field": "sets",
-                    "title": "Sets",
-                    "type": "nominal"
                   }
                 ],
                 "x": {
@@ -313,7 +307,7 @@
                 "size": 100,
                 "type": "circle"
               },
-              "name": "view_42",
+              "name": "view_2",
               "transform": [
                 {
                   "aggregate": [
@@ -358,12 +352,12 @@
                 },
                 {
                   "filter": {
-                    "param": "param_31"
+                    "param": "param_1"
                   }
                 },
                 {
                   "filter": {
-                    "param": "param_31"
+                    "param": "param_1"
                   }
                 },
                 {
@@ -432,7 +426,7 @@
                   "condition": {
                     "test": {
                       "not": {
-                        "param": "param_32"
+                        "param": "param_2"
                       }
                     },
                     "value": "#3A3A3A"
@@ -441,7 +435,6 @@
                 },
                 "tooltip": [
                   {
-                    "aggregate": "max",
                     "field": "count",
                     "title": "Cardinality",
                     "type": "quantitative"
@@ -450,11 +443,6 @@
                     "field": "degree",
                     "title": "Degree",
                     "type": "quantitative"
-                  },
-                  {
-                    "field": "sets",
-                    "title": "Sets",
-                    "type": "nominal"
                   }
                 ],
                 "x": {
@@ -533,12 +521,12 @@
                 },
                 {
                   "filter": {
-                    "param": "param_31"
+                    "param": "param_1"
                   }
                 },
                 {
                   "filter": {
-                    "param": "param_31"
+                    "param": "param_1"
                   }
                 },
                 {
@@ -607,7 +595,7 @@
                   "condition": {
                     "test": {
                       "not": {
-                        "param": "param_32"
+                        "param": "param_2"
                       }
                     },
                     "value": "#3A3A3A"
@@ -616,7 +604,6 @@
                 },
                 "tooltip": [
                   {
-                    "aggregate": "max",
                     "field": "count",
                     "title": "Cardinality",
                     "type": "quantitative"
@@ -625,11 +612,6 @@
                     "field": "degree",
                     "title": "Degree",
                     "type": "quantitative"
-                  },
-                  {
-                    "field": "sets",
-                    "title": "Sets",
-                    "type": "nominal"
                   }
                 ],
                 "x": {
@@ -706,12 +688,12 @@
                 },
                 {
                   "filter": {
-                    "param": "param_31"
+                    "param": "param_1"
                   }
                 },
                 {
                   "filter": {
-                    "param": "param_31"
+                    "param": "param_1"
                   }
                 },
                 {
@@ -781,7 +763,6 @@
                 },
                 "tooltip": [
                   {
-                    "aggregate": "max",
                     "field": "count",
                     "title": "Cardinality",
                     "type": "quantitative"
@@ -790,11 +771,6 @@
                     "field": "degree",
                     "title": "Degree",
                     "type": "quantitative"
-                  },
-                  {
-                    "field": "sets",
-                    "title": "Sets",
-                    "type": "nominal"
                   }
                 ],
                 "x": {
@@ -870,12 +846,12 @@
                 },
                 {
                   "filter": {
-                    "param": "param_31"
+                    "param": "param_1"
                   }
                 },
                 {
                   "filter": {
-                    "param": "param_31"
+                    "param": "param_1"
                   }
                 },
                 {
@@ -945,7 +921,6 @@
                 },
                 "tooltip": [
                   {
-                    "aggregate": "max",
                     "field": "count",
                     "title": "Cardinality",
                     "type": "quantitative"
@@ -954,11 +929,6 @@
                     "field": "degree",
                     "title": "Degree",
                     "type": "quantitative"
-                  },
-                  {
-                    "field": "sets",
-                    "title": "Sets",
-                    "type": "nominal"
                   }
                 ],
                 "x": {
@@ -1035,12 +1005,12 @@
                 },
                 {
                   "filter": {
-                    "param": "param_31"
+                    "param": "param_1"
                   }
                 },
                 {
                   "filter": {
-                    "param": "param_31"
+                    "param": "param_1"
                   }
                 },
                 {
@@ -1152,7 +1122,7 @@
                 "size": 500,
                 "type": "circle"
               },
-              "name": "view_43",
+              "name": "view_3",
               "transform": [
                 {
                   "aggregate": [
@@ -1194,12 +1164,12 @@
                 },
                 {
                   "filter": {
-                    "param": "param_31"
+                    "param": "param_1"
                   }
                 },
                 {
                   "filter": {
-                    "param": "param_31"
+                    "param": "param_1"
                   }
                 },
                 {
@@ -1331,12 +1301,12 @@
                 },
                 {
                   "filter": {
-                    "param": "param_31"
+                    "param": "param_1"
                   }
                 },
                 {
                   "filter": {
-                    "param": "param_31"
+                    "param": "param_1"
                   }
                 },
                 {
@@ -1405,6 +1375,7 @@
       ],
       "resolve": {
         "scale": {
+          "x": "shared",
           "y": "shared"
         }
       },
@@ -1419,7 +1390,7 @@
               "condition": {
                 "test": {
                   "not": {
-                    "param": "param_32"
+                    "param": "param_2"
                   }
                 },
                 "value": "#3A3A3A"
@@ -1433,7 +1404,6 @@
             },
             "tooltip": [
               {
-                "aggregate": "max",
                 "field": "count",
                 "title": "Cardinality",
                 "type": "quantitative"
@@ -1442,11 +1412,6 @@
                 "field": "degree",
                 "title": "Degree",
                 "type": "quantitative"
-              },
-              {
-                "field": "sets",
-                "title": "Sets",
-                "type": "nominal"
               }
             ],
             "x": {
@@ -1523,12 +1488,12 @@
             },
             {
               "filter": {
-                "param": "param_31"
+                "param": "param_1"
               }
             },
             {
               "filter": {
-                "param": "param_31"
+                "param": "param_1"
               }
             },
             {
@@ -1597,7 +1562,7 @@
               "condition": {
                 "test": {
                   "not": {
-                    "param": "param_32"
+                    "param": "param_2"
                   }
                 },
                 "value": "#3A3A3A"
@@ -1606,7 +1571,6 @@
             },
             "tooltip": [
               {
-                "aggregate": "max",
                 "field": "count",
                 "title": "Cardinality",
                 "type": "quantitative"
@@ -1615,11 +1579,6 @@
                 "field": "degree",
                 "title": "Degree",
                 "type": "quantitative"
-              },
-              {
-                "field": "sets",
-                "title": "Sets",
-                "type": "nominal"
               }
             ],
             "x": {
@@ -1651,10 +1610,10 @@
           },
           "mark": {
             "color": "#3A3A3A",
-            "size": 17.5,
+            "size": 26.875,
             "type": "bar"
           },
-          "name": "view_41",
+          "name": "view_1",
           "transform": [
             {
               "aggregate": [
@@ -1696,12 +1655,12 @@
             },
             {
               "filter": {
-                "param": "param_31"
+                "param": "param_1"
               }
             },
             {
               "filter": {
-                "param": "param_31"
+                "param": "param_1"
               }
             },
             {

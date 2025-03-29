@@ -281,7 +281,6 @@
                 },
                 "tooltip": [
                   {
-                    "aggregate": "max",
                     "field": "count",
                     "title": "Cardinality",
                     "type": "quantitative"
@@ -290,11 +289,6 @@
                     "field": "degree",
                     "title": "Degree",
                     "type": "quantitative"
-                  },
-                  {
-                    "field": "sets",
-                    "title": "Sets",
-                    "type": "nominal"
                   }
                 ],
                 "x": {
@@ -465,7 +459,6 @@
                 },
                 "tooltip": [
                   {
-                    "aggregate": "max",
                     "field": "count",
                     "title": "Cardinality",
                     "type": "quantitative"
@@ -474,11 +467,6 @@
                     "field": "degree",
                     "title": "Degree",
                     "type": "quantitative"
-                  },
-                  {
-                    "field": "sets",
-                    "title": "Sets",
-                    "type": "nominal"
                   }
                 ],
                 "x": {
@@ -648,7 +636,6 @@
                 },
                 "tooltip": [
                   {
-                    "aggregate": "max",
                     "field": "count",
                     "title": "Cardinality",
                     "type": "quantitative"
@@ -657,11 +644,6 @@
                     "field": "degree",
                     "title": "Degree",
                     "type": "quantitative"
-                  },
-                  {
-                    "field": "sets",
-                    "title": "Sets",
-                    "type": "nominal"
                   }
                 ],
                 "x": {
@@ -821,7 +803,6 @@
                 },
                 "tooltip": [
                   {
-                    "aggregate": "max",
                     "field": "count",
                     "title": "Cardinality",
                     "type": "quantitative"
@@ -830,11 +811,6 @@
                     "field": "degree",
                     "title": "Degree",
                     "type": "quantitative"
-                  },
-                  {
-                    "field": "sets",
-                    "title": "Sets",
-                    "type": "nominal"
                   }
                 ],
                 "x": {
@@ -993,7 +969,6 @@
                 },
                 "tooltip": [
                   {
-                    "aggregate": "max",
                     "field": "count",
                     "title": "Cardinality",
                     "type": "quantitative"
@@ -1002,11 +977,6 @@
                     "field": "degree",
                     "title": "Degree",
                     "type": "quantitative"
-                  },
-                  {
-                    "field": "sets",
-                    "title": "Sets",
-                    "type": "nominal"
                   }
                 ],
                 "x": {
@@ -1485,6 +1455,7 @@
       ],
       "resolve": {
         "scale": {
+          "x": "shared",
           "y": "shared"
         }
       },
@@ -1513,7 +1484,6 @@
             },
             "tooltip": [
               {
-                "aggregate": "max",
                 "field": "count",
                 "title": "Cardinality",
                 "type": "quantitative"
@@ -1522,11 +1492,6 @@
                 "field": "degree",
                 "title": "Degree",
                 "type": "quantitative"
-              },
-              {
-                "field": "sets",
-                "title": "Sets",
-                "type": "nominal"
               }
             ],
             "x": {
@@ -1694,7 +1659,6 @@
             },
             "tooltip": [
               {
-                "aggregate": "max",
                 "field": "count",
                 "title": "Cardinality",
                 "type": "quantitative"
@@ -1703,11 +1667,6 @@
                 "field": "degree",
                 "title": "Degree",
                 "type": "quantitative"
-              },
-              {
-                "field": "sets",
-                "title": "Sets",
-                "type": "nominal"
               }
             ],
             "x": {

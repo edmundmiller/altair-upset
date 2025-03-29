@@ -89,7 +89,6 @@ def UpSetAltair(
     line_connection_size: int = 1,  # Reduced from 2
     horizontal_bar_size: int = 20,
     vertical_bar_label_size: int = 16,
-    vertical_bar_padding: int = 20,
     theme: Optional[str] = None,
 ) -> UpSetChart:
     """Generate interactive UpSet plots using Altair. [Lex et al., 2014]_
@@ -138,8 +137,6 @@ def UpSetAltair(
         Height of horizontal bars in pixels.
     vertical_bar_label_size : int, default 16
         Font size of vertical bar labels.
-    vertical_bar_padding : int, default 20
-        Padding between vertical bars.
     theme : str, optional
         Altair theme to use. If None, uses the current default theme.
 
@@ -214,10 +211,10 @@ def UpSetAltair(
     vertical_bar_chart_height = height * height_ratio
     matrix_height = (height - vertical_bar_chart_height) * 0.8  # Reduce height to tighten spacing
     matrix_width = width - horizontal_bar_chart_width
-    vertical_bar_size = min(
-        30,
-        width / len(data["intersection_id"].unique().tolist()) - vertical_bar_padding,
-    )
+
+    # Automatic padding
+    num_intersections = max(1, len(data["intersection_id"].unique().tolist()))
+    vertical_bar_size = min(30, (matrix_width / num_intersections) - 5)  # 5 is good
 
     # Setup styles
     main_color = "#3A3A3A"
@@ -232,9 +229,9 @@ def UpSetAltair(
         field="count" if sort_by == "frequency" else "degree", order=sort_order
     )
     tooltip = [
-        alt.Tooltip("max(count):Q", title="Cardinality"),
+        alt.Tooltip("count:Q", title="Cardinality"),
         alt.Tooltip("degree:Q", title="Degree"),
-        alt.Tooltip("sets:N", title="Sets"),
+        # alt.Tooltip("sets_graph:N", title="Groups"),  # Bugged. sets_graph is already available in preprocessing.py
     ]
 
     # Create base chart
@@ -299,7 +296,7 @@ def UpSetAltair(
             horizontal_bar_axis,
             horizontal_bar.properties(width=horizontal_bar_chart_width),
             spacing=0,  # Minimize spacing between components
-        ).resolve_scale(y="shared"),
+        ).resolve_scale(x="shared", y="shared"),  # X shared also
         spacing=5,
     ).add_params(legend_selection)
 
