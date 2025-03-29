@@ -117,7 +117,6 @@ def test_upset_by_degree_custom(covid_symptoms_data, output_dir, snapshot):
         line_connection_size=1,
         horizontal_bar_size=16,
         vertical_bar_label_size=12,
-        vertical_bar_padding=14,
     )
 
     # Save generated spec for debugging
