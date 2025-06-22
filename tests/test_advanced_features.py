@@ -146,3 +146,66 @@ def test_custom_colors(sample_data):
     horizontal_bar = hconcat.hconcat[-1]
     assert "scale" in str(horizontal_bar.encoding.color)
     assert all(color in str(horizontal_bar.encoding.color) for color in custom_colors)
+
+
+def test_vertical_bar_y_axis_orient_default(sample_data):
+    """Test that the default vertical bar y-axis orientation is 'right'."""
+    chart = au.UpSetAltair(data=sample_data, sets=["A", "B", "C"])
+
+    # Get the vertical bar chart component (first layer of the first vconcat)
+    vertical_bar = chart.chart.vconcat[0]
+    first_layer = vertical_bar.layer[0]
+
+    # Check y-axis orientation in the encoding
+    encoding_dict = first_layer.encoding.to_dict()
+    y_axis_config = encoding_dict["y"]["axis"]
+    assert y_axis_config["orient"] == "right"
+
+
+def test_vertical_bar_y_axis_orient_left(sample_data):
+    """Test setting vertical bar y-axis orientation to 'left'."""
+    chart = au.UpSetAltair(
+        data=sample_data, sets=["A", "B", "C"], vertical_bar_y_axis_orient="left"
+    )
+
+    # Get the vertical bar chart component (first layer of the first vconcat)
+    vertical_bar = chart.chart.vconcat[0]
+    first_layer = vertical_bar.layer[0]
+
+    # Check y-axis orientation in the encoding
+    encoding_dict = first_layer.encoding.to_dict()
+    y_axis_config = encoding_dict["y"]["axis"]
+    assert y_axis_config["orient"] == "left"
+
+
+def test_vertical_bar_y_axis_orient_right(sample_data):
+    """Test setting vertical bar y-axis orientation to 'right'."""
+    chart = au.UpSetAltair(
+        data=sample_data, sets=["A", "B", "C"], vertical_bar_y_axis_orient="right"
+    )
+
+    # Get the vertical bar chart component (first layer of the first vconcat)
+    vertical_bar = chart.chart.vconcat[0]
+    first_layer = vertical_bar.layer[0]
+
+    # Check y-axis orientation in the encoding
+    encoding_dict = first_layer.encoding.to_dict()
+    y_axis_config = encoding_dict["y"]["axis"]
+    assert y_axis_config["orient"] == "right"
+
+
+def test_vertical_bar_y_axis_orient_invalid_value(sample_data):
+    """Test that invalid values for vertical_bar_y_axis_orient raise ValueError."""
+    with pytest.raises(
+        ValueError, match="vertical bar y axis orient must be 'left' or 'right'"
+    ):
+        au.UpSetAltair(
+            data=sample_data, sets=["A", "B", "C"], vertical_bar_y_axis_orient="top"
+        )
+
+    with pytest.raises(
+        ValueError, match="vertical bar y axis orient must be 'left' or 'right'"
+    ):
+        au.UpSetAltair(
+            data=sample_data, sets=["A", "B", "C"], vertical_bar_y_axis_orient="bottom"
+        )
