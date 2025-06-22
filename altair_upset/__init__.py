@@ -1,6 +1,6 @@
 """UpSet plots using Altair."""
 
-from .upset import UpSetAltair
 from .config import upsetaltair_top_level_configuration
+from .upset import UpSetAltair
 
 __all__ = ["UpSetAltair", "upsetaltair_top_level_configuration"]

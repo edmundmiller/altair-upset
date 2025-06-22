@@ -1,6 +1,5 @@
-import pytest
 import polars as pl
-import pandas as pd
+
 from altair_upset.preprocessing import preprocess_data
 from altair_upset.upset import UpSetAltair
 

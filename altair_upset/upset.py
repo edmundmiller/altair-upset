@@ -93,20 +93,23 @@ def UpSetAltair(
 ) -> UpSetChart:
     """Generate interactive UpSet plots using Altair. [Lex et al., 2014]_
 
-    UpSet plots are used to visualize set intersections in a more scalable way than Venn diagrams.
-    This implementation provides interactive features like hover highlighting and legend filtering.
+    UpSet plots are used to visualize set intersections in a more scalable way
+    than Venn diagrams. This implementation provides interactive features like
+    hover highlighting and legend filtering.
 
     Parameters
     ----------
     data : pandas.DataFrame
-        Input data where each column represents a set and contains binary values (0 or 1).
+        Input data where each column represents a set and contains binary
+        values (0 or 1).
         Each row represents an element, and the columns indicate set membership.
     sets : list of str
         Names of the sets to visualize (must correspond to column names in data).
     title : str, default ""
         Title of the plot.
     subtitle : str or list of str, default ""
-        Subtitle(s) of the plot. Can be a single string or list of strings for multiple lines.
+        Subtitle(s) of the plot. Can be a single string or list of strings
+        for multiple lines.
     abbre : list of str, optional
         Abbreviations for set names (must have same length as sets).
     sort_by : {"frequency", "degree"}, default "frequency"
@@ -169,9 +172,11 @@ def UpSetAltair(
 
     References
     ----------
-    .. [Lex et al., 2014] Alexander Lex, Nils Gehlenborg, Hendrik Strobelt, Romain Vuillemot, Hanspeter Pfister.
+    .. [Lex et al., 2014] Alexander Lex, Nils Gehlenborg, Hendrik Strobelt,
+                Romain Vuillemot, Hanspeter Pfister.
                 UpSet: Visualization of Intersecting Sets
-                IEEE transactions on visualization and computer graphics, 20(12), 1983-1992.
+                IEEE transactions on visualization and computer graphics,
+                20(12), 1983-1992.
     """
     # Input validation
     if not isinstance(data, pd.DataFrame):
@@ -203,7 +208,6 @@ def UpSetAltair(
     # Setup selections for interactivity
     legend_selection = alt.selection_point(fields=["set"], bind="legend")
     color_selection = alt.selection_point(fields=["intersection_id"], on="mouseover")
-    opacity_selection = alt.selection_point(fields=["intersection_id"])
 
     # Calculate dimensions
     if horizontal_bar_chart_width is None:
@@ -233,7 +237,8 @@ def UpSetAltair(
     tooltip = [
         alt.Tooltip("count:Q", title="Cardinality"),
         alt.Tooltip("degree:Q", title="Degree"),
-        # alt.Tooltip("sets_graph:N", title="Groups"),  # Bugged. sets_graph is already available in preprocessing.py
+        # alt.Tooltip("sets_graph:N", title="Groups"),  # Bugged. sets_graph
+        # is already available in preprocessing.py
     ]
 
     # Create base chart

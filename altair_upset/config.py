@@ -1,4 +1,3 @@
-import altair as alt
 
 
 def upsetaltair_top_level_configuration(

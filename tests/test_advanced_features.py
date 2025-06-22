@@ -1,9 +1,10 @@
 """Tests for advanced UpSet plot features."""
 
-import pytest
-import pandas as pd
-import numpy as np
 import altair as alt
+import numpy as np
+import pandas as pd
+import pytest
+
 import altair_upset as au
 
 
