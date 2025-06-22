@@ -11,6 +11,7 @@ def create_vertical_bar(
     x_sort,
     tooltip,
     vertical_bar_label_size,
+    vertical_bar_y_axis_orient,
 ):
     """Creates the vertical bar chart component."""
     vertical_bar = base.mark_bar(color=main_color, size=vertical_bar_size).encode(
@@ -22,7 +23,7 @@ def create_vertical_bar(
         ),
         y=alt.Y(
             "max(count):Q",
-            axis=alt.Axis(grid=False, tickCount=3, orient="right"),
+            axis=alt.Axis(grid=False, tickCount=3, orient=vertical_bar_y_axis_orient),
             title="Intersection Size",
         ),
         color=brush_color,

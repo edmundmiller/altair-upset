@@ -89,6 +89,7 @@ def UpSetAltair(
     line_connection_size: int = 1,  # Reduced from 2
     horizontal_bar_size: int = 20,
     vertical_bar_label_size: int = 16,
+    vertical_bar_y_axis_orient: str = "right",
     theme: Optional[str] = None,
 ) -> UpSetChart:
     """Generate interactive UpSet plots using Altair. [Lex et al., 2014]_
@@ -140,6 +141,8 @@ def UpSetAltair(
         Height of horizontal bars in pixels.
     vertical_bar_label_size : int, default 16
         Font size of vertical bar labels.
+    vertical_bar_y_axis_orient : str, default "right"
+        Whether to show the vertical bar chart Y axis on the right or left of the plot.
     theme : str, optional
         Altair theme to use. If None, uses the current default theme.
 
@@ -195,6 +198,8 @@ def UpSetAltair(
         raise ValueError("sort_order must be either 'ascending' or 'descending'")
     if abbre is not None and len(sets) != len(abbre):
         raise ValueError("if provided, abbre must have the same length as sets")
+    if vertical_bar_y_axis_orient not in ["left", "right"]:
+        raise ValueError("vertical bar y axis orient must be 'left' or 'right'")
 
     # Apply theme if specified
     if theme is not None:
@@ -255,6 +260,7 @@ def UpSetAltair(
         x_sort,
         tooltip,
         vertical_bar_label_size,
+        vertical_bar_y_axis_orient,
     )
     vertical_bar_chart = (
         (vertical_bar + vertical_bar_text)
