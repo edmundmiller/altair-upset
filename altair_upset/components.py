@@ -1,3 +1,5 @@
+from typing import List
+
 import altair as alt
 
 
@@ -121,3 +123,45 @@ def create_horizontal_bar(
     )
 
     return horizontal_bar_label_bg, horizontal_bar_label, horizontal_bar
+
+
+def integrate_annotation_charts(
+    annotation_charts: List[alt.Chart],
+    vertical_bar_chart: alt.Chart,
+    main_upset_chart: alt.Chart,
+    spacing: int = 5
+) -> alt.Chart:
+    """
+    Integrate annotation charts above the main UpSet plot.
+    
+    Parameters
+    ----------
+    annotation_charts : List[alt.Chart]
+        List of annotation charts to place above the main plot
+    vertical_bar_chart : alt.Chart
+        The vertical bar chart component
+    main_upset_chart : alt.Chart
+        The main UpSet chart (matrix + horizontal bars)
+    spacing : int
+        Spacing between chart components
+        
+    Returns
+    -------
+    alt.Chart
+        Combined chart with annotations above the main plot
+    """
+    if not annotation_charts:
+        return alt.vconcat(
+            vertical_bar_chart,
+            main_upset_chart,
+            spacing=spacing
+        )
+    
+    # Create the full vertical concatenation:
+    # Annotations (top to bottom) -> Vertical bar chart -> Matrix + horizontal bars
+    all_components = annotation_charts + [vertical_bar_chart, main_upset_chart]
+    
+    return alt.vconcat(
+        *all_components,
+        spacing=spacing
+    )
