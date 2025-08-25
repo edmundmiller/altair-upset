@@ -1,18 +1,28 @@
-from typing import List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import altair as alt
 import pandas as pd
 
-from .components import create_horizontal_bar, create_matrix_view, create_vertical_bar
+from .annotations import create_annotation_charts, parse_annotation_specs
+from .components import (
+    create_horizontal_bar,
+    create_matrix_view,
+    create_vertical_bar,
+    integrate_annotation_charts,
+)
 from .config import upsetaltair_top_level_configuration
-from .preprocessing import preprocess_data
+from .preprocessing import (
+    preprocess_annotation_data,
+    preprocess_data,
+    validate_annotation_attributes,
+)
 from .transforms import create_base_chart
 
 
 class UpSetChart:
     """A wrapper class for UpSet plots."""
 
-    def __init__(self, chart, data, sets):
+    def __init__(self, chart, data, sets, annotation_data=None):
         """Initialize the UpSetChart.
 
         Parameters
@@ -23,10 +33,13 @@ class UpSetChart:
             The input data
         sets : list
             List of set names
+        annotation_data : dict, optional
+            Dictionary of annotation data by attribute name
         """
         self.chart = chart
         self.data = data
         self.sets = sets
+        self.annotation_data = annotation_data or {}
 
     def save(self, filename):
         """Save the chart to a file."""
@@ -91,6 +104,9 @@ def UpSetAltair(
     vertical_bar_label_size: int = 16,
     vertical_bar_y_axis_orient: str = "right",
     theme: Optional[str] = None,
+    annotations: Optional[
+        Union[Dict[str, Dict[str, Any]], List[Dict[str, Any]]]
+    ] = None,
 ) -> UpSetChart:
     """Generate interactive UpSet plots using Altair. [Lex et al., 2014]_
 
@@ -145,6 +161,12 @@ def UpSetAltair(
         Whether to show the vertical bar chart Y axis on the right or left of the plot.
     theme : str, optional
         Altair theme to use. If None, uses the current default theme.
+    annotations : dict or list, optional
+        Annotation specifications for additional plots above intersection bars.
+        Can be a dictionary mapping attribute names to plot specifications:
+        {'attribute': {'type': 'boxplot', 'height': 100, 'title': 'Title'}}
+        Or a list of annotation specifications with 'attribute' key.
+        Supported plot types: 'boxplot', 'violin', 'strip', 'bar'.
 
     Returns
     -------
@@ -200,6 +222,22 @@ def UpSetAltair(
         raise ValueError("if provided, abbre must have the same length as sets")
     if vertical_bar_y_axis_orient not in ["left", "right"]:
         raise ValueError("vertical bar y axis orient must be 'left' or 'right'")
+
+    # Process annotations if provided
+    annotation_data = {}
+    annotation_specs = []
+    if annotations:
+        annotation_specs = parse_annotation_specs(annotations)
+        annotation_attributes = [spec.attribute for spec in annotation_specs]
+        validate_annotation_attributes(data, annotation_attributes)
+        
+        # Store original data for annotations
+        original_data = data.copy()
+        
+        # Preprocess annotation data
+        annotation_data = preprocess_annotation_data(
+            original_data, sets, annotation_attributes, sort_order
+        )
 
     # Apply theme if specified
     if theme is not None:
@@ -301,16 +339,31 @@ def UpSetAltair(
         else horizontal_bar_label
     ).properties(width=horizontal_bar_chart_width)
 
+    # Create annotation charts if specified
+    annotation_charts = []
+    if annotation_specs:
+        annotation_charts = create_annotation_charts(
+            annotation_data,
+            annotation_specs,
+            matrix_width,
+            x_sort,
+            main_color
+        )
+
     # Combine components
-    upsetaltair = alt.vconcat(
+    main_upset_chart = alt.hconcat(
+        matrix_view,
+        horizontal_bar_axis,
+        horizontal_bar.properties(width=horizontal_bar_chart_width),
+        spacing=0,  # Minimize spacing between components
+    ).resolve_scale(x="shared", y="shared")  # X shared also
+    
+    # Integrate annotation charts above the main plot
+    upsetaltair = integrate_annotation_charts(
+        annotation_charts,
         vertical_bar_chart,
-        alt.hconcat(
-            matrix_view,
-            horizontal_bar_axis,
-            horizontal_bar.properties(width=horizontal_bar_chart_width),
-            spacing=0,  # Minimize spacing between components
-        ).resolve_scale(x="shared", y="shared"),  # X shared also
-        spacing=5,
+        main_upset_chart,
+        spacing=5
     ).add_params(legend_selection)
 
     # Apply configuration
@@ -327,4 +380,4 @@ def UpSetAltair(
         }
     )
 
-    return UpSetChart(chart, data, sets)
+    return UpSetChart(chart, data, sets, annotation_data)
