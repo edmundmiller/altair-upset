@@ -90,6 +90,7 @@ def UpSetAltair(
     horizontal_bar_size: int = 20,
     vertical_bar_label_size: int = 16,
     vertical_bar_y_axis_orient: str = "right",
+    vertical_bar_text_inside: bool = False,
     theme: Optional[str] = None,
 ) -> UpSetChart:
     """Generate interactive UpSet plots using Altair. [Lex et al., 2014]_
@@ -143,6 +144,9 @@ def UpSetAltair(
         Font size of vertical bar labels.
     vertical_bar_y_axis_orient : str, default "right"
         Whether to show the vertical bar chart Y axis on the right or left of the plot.
+    vertical_bar_text_inside : bool, default False
+        Whether to place the text labels inside the bars instead of above them.
+        When True, text appears centered inside bars with white color for visibility.
     theme : str, optional
         Altair theme to use. If None, uses the current default theme.
 
@@ -261,6 +265,7 @@ def UpSetAltair(
         tooltip,
         vertical_bar_label_size,
         vertical_bar_y_axis_orient,
+        vertical_bar_text_inside,
     )
     vertical_bar_chart = (
         (vertical_bar + vertical_bar_text)

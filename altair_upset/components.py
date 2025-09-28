@@ -12,6 +12,7 @@ def create_vertical_bar(
     tooltip,
     vertical_bar_label_size,
     vertical_bar_y_axis_orient,
+    vertical_bar_text_inside,
 ):
     """Creates the vertical bar chart component."""
     vertical_bar = base.mark_bar(color=main_color, size=vertical_bar_size).encode(
@@ -30,9 +31,17 @@ def create_vertical_bar(
         tooltip=tooltip,
     )
 
-    vertical_bar_text = vertical_bar.mark_text(
-        color=main_color, dy=-10, size=vertical_bar_label_size
-    ).encode(text=alt.Text("count:Q", format=".0f"))
+    # Position text based on vertical_bar_text_inside parameter
+    if vertical_bar_text_inside:
+        # Place text inside bars with white color for visibility
+        vertical_bar_text = vertical_bar.mark_text(
+            color="white", dy=0, size=vertical_bar_label_size, align="center", baseline="middle"
+        ).encode(text=alt.Text("count:Q", format=".0f"))
+    else:
+        # Place text above bars with main color (original behavior)
+        vertical_bar_text = vertical_bar.mark_text(
+            color=main_color, dy=-10, size=vertical_bar_label_size
+        ).encode(text=alt.Text("count:Q", format=".0f"))
 
     return vertical_bar, vertical_bar_text
 
