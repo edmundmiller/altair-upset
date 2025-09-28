@@ -210,3 +210,60 @@ def test_vertical_bar_y_axis_orient_invalid_value(sample_data):
         au.UpSetAltair(
             data=sample_data, sets=["A", "B", "C"], vertical_bar_y_axis_orient="bottom"
         )
+
+
+def test_vertical_bar_text_inside_default(sample_data):
+    """Test that vertical bar text is outside bars by default."""
+    chart = au.UpSetAltair(data=sample_data, sets=["A", "B", "C"])
+    
+    # Get the vertical bar chart component (second layer should be text)
+    vertical_bar = chart.chart.vconcat[0]
+    text_layer = vertical_bar.layer[1]
+    
+    # Check that it's a text mark
+    assert text_layer.mark.type == "text"
+    
+    # Check that dy is -10 (above bars) for default behavior
+    assert text_layer.mark.dy == -10
+    
+    # Check that color is not white (should use main color)
+    assert text_layer.mark.color != "white"
+
+
+def test_vertical_bar_text_inside_true(sample_data):
+    """Test that vertical bar text appears inside bars when vertical_bar_text_inside=True."""
+    chart = au.UpSetAltair(
+        data=sample_data, sets=["A", "B", "C"], vertical_bar_text_inside=True
+    )
+    
+    # Get the vertical bar chart component (second layer should be text)
+    vertical_bar = chart.chart.vconcat[0]
+    text_layer = vertical_bar.layer[1]
+    
+    # Check that it's a text mark
+    assert text_layer.mark.type == "text"
+    
+    # Check that dy is 0 (inside bars) for inside behavior
+    assert text_layer.mark.dy == 0
+    
+    # Check that color is white for visibility inside bars
+    assert text_layer.mark.color == "white"
+    
+    # Check that alignment is center
+    assert text_layer.mark.align == "center"
+    assert text_layer.mark.baseline == "middle"
+
+
+def test_vertical_bar_text_inside_false(sample_data):
+    """Test that vertical_bar_text_inside=False behaves same as default."""
+    chart_default = au.UpSetAltair(data=sample_data, sets=["A", "B", "C"])
+    chart_explicit_false = au.UpSetAltair(
+        data=sample_data, sets=["A", "B", "C"], vertical_bar_text_inside=False
+    )
+    
+    # Both should have same text positioning
+    text_layer_default = chart_default.chart.vconcat[0].layer[1]
+    text_layer_false = chart_explicit_false.chart.vconcat[0].layer[1]
+    
+    assert text_layer_default.mark.dy == text_layer_false.mark.dy
+    assert text_layer_default.mark.color == text_layer_false.mark.color
