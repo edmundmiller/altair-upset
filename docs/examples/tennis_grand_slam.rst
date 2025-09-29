@@ -62,6 +62,7 @@ of tennis Grand Slam tournament winners across different venues.
         current_idx = end_idx
 
 .. altair-plot::
+
     au.UpSetAltair(
         data=data,
         sets=data.columns.tolist(),
