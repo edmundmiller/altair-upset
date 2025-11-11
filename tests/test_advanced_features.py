@@ -216,70 +216,170 @@ def test_highlight_least(sample_data):
     """Test highlighting the intersection with the smallest size."""
     chart = au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], highlight="least")
 
-    # Get the chart spec and check for selection with value
+    # Calculate the expected result independently from the processed data
+    processed_data = chart.data
+    intersection_counts = (
+        processed_data.groupby("intersection_id")["count"]
+        .first()
+        .reset_index()
+    )
+    expected_min_id = intersection_counts.loc[
+        intersection_counts["count"].idxmin(), "intersection_id"
+    ]
+
+    # Extract actual highlighted intersection from chart spec
     spec = chart.chart.to_dict()
     params = spec.get("params", [])
-    assert len(params) > 0
 
-    # Check that a selection with a value is present (not just mouseover)
-    has_value_selection = any(
-        "value" in p and p["value"] is not None for p in params
+    # Find the color_selection parameter (has intersection_id field)
+    color_param = next(
+        (p for p in params
+         if "select" in p and "fields" in p["select"]
+         and "intersection_id" in p["select"]["fields"]
+         and "value" in p),
+        None
     )
-    assert has_value_selection, "Expected to find a selection parameter with a value"
+
+    assert color_param is not None, "No selection parameter with intersection_id found"
+
+    # Verify the correct intersection is highlighted
+    actual_ids = [v["intersection_id"] for v in color_param["value"]]
+    assert len(actual_ids) == 1, f"Expected 1 highlighted intersection, got {len(actual_ids)}"
+    assert actual_ids[0] == expected_min_id, (
+        f"Expected intersection {expected_min_id} (smallest), but got {actual_ids[0]}"
+    )
+
+    # Verify it's actually the minimum count
+    min_count = intersection_counts.loc[
+        intersection_counts["intersection_id"] == expected_min_id, "count"
+    ].values[0]
+    assert min_count == intersection_counts["count"].min(), (
+        "Highlighted intersection doesn't have the minimum count"
+    )
 
 
 def test_highlight_greatest(sample_data):
     """Test highlighting the intersection with the largest size."""
     chart = au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], highlight="greatest")
 
-    # Get the chart spec and check for selection with value
+    # Calculate the expected result independently from the processed data
+    processed_data = chart.data
+    intersection_counts = (
+        processed_data.groupby("intersection_id")["count"]
+        .first()
+        .reset_index()
+    )
+    expected_max_id = intersection_counts.loc[
+        intersection_counts["count"].idxmax(), "intersection_id"
+    ]
+
+    # Extract actual highlighted intersection from chart spec
     spec = chart.chart.to_dict()
     params = spec.get("params", [])
-    assert len(params) > 0
 
-    # Check that a selection with a value is present
-    has_value_selection = any(
-        "value" in p and p["value"] is not None for p in params
+    # Find the color_selection parameter
+    color_param = next(
+        (p for p in params
+         if "select" in p and "fields" in p["select"]
+         and "intersection_id" in p["select"]["fields"]
+         and "value" in p),
+        None
     )
-    assert has_value_selection, "Expected to find a selection parameter with a value"
+
+    assert color_param is not None, "No selection parameter with intersection_id found"
+
+    # Verify the correct intersection is highlighted
+    actual_ids = [v["intersection_id"] for v in color_param["value"]]
+    assert len(actual_ids) == 1, f"Expected 1 highlighted intersection, got {len(actual_ids)}"
+    assert actual_ids[0] == expected_max_id, (
+        f"Expected intersection {expected_max_id} (largest), but got {actual_ids[0]}"
+    )
+
+    # Verify it's actually the maximum count
+    max_count = intersection_counts.loc[
+        intersection_counts["intersection_id"] == expected_max_id, "count"
+    ].values[0]
+    assert max_count == intersection_counts["count"].max(), (
+        "Highlighted intersection doesn't have the maximum count"
+    )
 
 
 def test_highlight_specific_index(sample_data):
     """Test highlighting a specific intersection by index."""
     chart = au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], highlight=0)
 
-    # Get the chart spec and check for selection with value
+    # Calculate the expected result - index 0 should be the first intersection
+    processed_data = chart.data
+    intersections = (
+        processed_data.groupby("intersection_id")["count"]
+        .first()
+        .reset_index()
+        .sort_index()
+    )
+    expected_id = intersections.iloc[0]["intersection_id"]
+
+    # Extract actual highlighted intersection from chart spec
     spec = chart.chart.to_dict()
     params = spec.get("params", [])
-    assert len(params) > 0
 
-    # Check that a selection with a value is present
-    has_value_selection = any(
-        "value" in p and p["value"] is not None for p in params
+    # Find the color_selection parameter
+    color_param = next(
+        (p for p in params
+         if "select" in p and "fields" in p["select"]
+         and "intersection_id" in p["select"]["fields"]
+         and "value" in p),
+        None
     )
-    assert has_value_selection, "Expected to find a selection parameter with a value"
+
+    assert color_param is not None, "No selection parameter with intersection_id found"
+
+    # Verify the correct intersection is highlighted
+    actual_ids = [v["intersection_id"] for v in color_param["value"]]
+    assert len(actual_ids) == 1, f"Expected 1 highlighted intersection, got {len(actual_ids)}"
+    assert actual_ids[0] == expected_id, (
+        f"Expected intersection {expected_id} at index 0, but got {actual_ids[0]}"
+    )
 
 
 def test_highlight_multiple_indices(sample_data):
     """Test highlighting multiple intersections by indices."""
     chart = au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], highlight=[0, 1, 2])
 
-    # Get the chart spec and check for selection with value
+    # Calculate the expected results - indices 0, 1, 2
+    processed_data = chart.data
+    intersections = (
+        processed_data.groupby("intersection_id")["count"]
+        .first()
+        .reset_index()
+        .sort_index()
+    )
+    expected_ids = [
+        intersections.iloc[0]["intersection_id"],
+        intersections.iloc[1]["intersection_id"],
+        intersections.iloc[2]["intersection_id"]
+    ]
+
+    # Extract actual highlighted intersections from chart spec
     spec = chart.chart.to_dict()
     params = spec.get("params", [])
-    assert len(params) > 0
 
-    # Check that a selection with a value is present
-    has_value_selection = any(
-        "value" in p and p["value"] is not None for p in params
+    # Find the color_selection parameter
+    color_param = next(
+        (p for p in params
+         if "select" in p and "fields" in p["select"]
+         and "intersection_id" in p["select"]["fields"]
+         and "value" in p),
+        None
     )
-    assert has_value_selection, "Expected to find a selection parameter with a value"
 
-    # Check that the value contains multiple intersection_ids
-    value_param = next((p for p in params if "value" in p and p["value"] is not None), None)
-    assert value_param is not None
-    # Should have multiple values in the list
-    assert len(value_param["value"]) > 1, "Expected multiple intersection IDs to be highlighted"
+    assert color_param is not None, "No selection parameter with intersection_id found"
+
+    # Verify the correct intersections are highlighted
+    actual_ids = [v["intersection_id"] for v in color_param["value"]]
+    assert len(actual_ids) == 3, f"Expected 3 highlighted intersections, got {len(actual_ids)}"
+    assert set(actual_ids) == set(expected_ids), (
+        f"Expected intersections {expected_ids}, but got {actual_ids}"
+    )
 
 
 def test_highlight_none_default_hover(sample_data):
