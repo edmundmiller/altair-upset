@@ -210,3 +210,116 @@ def test_vertical_bar_y_axis_orient_invalid_value(sample_data):
         au.UpSetAltair(
             data=sample_data, sets=["A", "B", "C"], vertical_bar_y_axis_orient="bottom"
         )
+
+
+def test_highlight_least(sample_data):
+    """Test highlighting the intersection with the smallest size."""
+    chart = au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], highlight="least")
+
+    # Get the chart spec and check for selection with value
+    spec = chart.chart.to_dict()
+    params = spec.get("params", [])
+    assert len(params) > 0
+
+    # Check that a selection with a value is present (not just mouseover)
+    has_value_selection = any(
+        "value" in p and p["value"] is not None for p in params
+    )
+    assert has_value_selection, "Expected to find a selection parameter with a value"
+
+
+def test_highlight_greatest(sample_data):
+    """Test highlighting the intersection with the largest size."""
+    chart = au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], highlight="greatest")
+
+    # Get the chart spec and check for selection with value
+    spec = chart.chart.to_dict()
+    params = spec.get("params", [])
+    assert len(params) > 0
+
+    # Check that a selection with a value is present
+    has_value_selection = any(
+        "value" in p and p["value"] is not None for p in params
+    )
+    assert has_value_selection, "Expected to find a selection parameter with a value"
+
+
+def test_highlight_specific_index(sample_data):
+    """Test highlighting a specific intersection by index."""
+    chart = au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], highlight=0)
+
+    # Get the chart spec and check for selection with value
+    spec = chart.chart.to_dict()
+    params = spec.get("params", [])
+    assert len(params) > 0
+
+    # Check that a selection with a value is present
+    has_value_selection = any(
+        "value" in p and p["value"] is not None for p in params
+    )
+    assert has_value_selection, "Expected to find a selection parameter with a value"
+
+
+def test_highlight_multiple_indices(sample_data):
+    """Test highlighting multiple intersections by indices."""
+    chart = au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], highlight=[0, 1, 2])
+
+    # Get the chart spec and check for selection with value
+    spec = chart.chart.to_dict()
+    params = spec.get("params", [])
+    assert len(params) > 0
+
+    # Check that a selection with a value is present
+    has_value_selection = any(
+        "value" in p and p["value"] is not None for p in params
+    )
+    assert has_value_selection, "Expected to find a selection parameter with a value"
+
+    # Check that the value contains multiple intersection_ids
+    value_param = next((p for p in params if "value" in p and p["value"] is not None), None)
+    assert value_param is not None
+    # Should have multiple values in the list
+    assert len(value_param["value"]) > 1, "Expected multiple intersection IDs to be highlighted"
+
+
+def test_highlight_none_default_hover(sample_data):
+    """Test that None (default) enables hover behavior."""
+    chart = au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], highlight=None)
+
+    # Get the chart spec and check for mouseover selection
+    spec = chart.chart.to_dict()
+    params = spec.get("params", [])
+    assert len(params) > 0
+
+    # Check that at least one selection has "on" set to "mouseover"
+    has_mouseover = any(
+        "select" in p and "on" in p["select"] and p["select"]["on"] == "mouseover"
+        for p in params
+    )
+    assert has_mouseover, "Expected to find a selection parameter with mouseover"
+
+
+def test_highlight_invalid_string(sample_data):
+    """Test that invalid string values for highlight raise ValueError."""
+    with pytest.raises(ValueError, match="highlight string must be 'least' or 'greatest'"):
+        au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], highlight="invalid")
+
+
+def test_highlight_negative_index(sample_data):
+    """Test that negative indices for highlight raise ValueError."""
+    with pytest.raises(ValueError, match="highlight index must be non-negative"):
+        au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], highlight=-1)
+
+
+def test_highlight_invalid_list(sample_data):
+    """Test that invalid list values for highlight raise ValueError."""
+    with pytest.raises(
+        ValueError, match="highlight list must contain non-negative integers"
+    ):
+        au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], highlight=[0, -1, 2])
+
+
+def test_highlight_invalid_type(sample_data):
+    """Test that invalid types for highlight raise TypeError."""
+    with pytest.raises(TypeError, match="highlight must be None, str, int, or list of int"):
+        au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], highlight=1.5)
