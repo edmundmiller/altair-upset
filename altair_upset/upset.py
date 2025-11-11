@@ -84,6 +84,7 @@ def UpSetAltair(
         "#BDC6CA",
     ],
     highlight_color: str = "#EA4667",
+    highlight: Optional[Union[str, int, List[int]]] = None,
     glyph_size: int = 100,  # Reduced from 200
     set_label_bg_size: int = 500,  # Reduced from 1000
     line_connection_size: int = 1,  # Reduced from 2
@@ -130,7 +131,14 @@ def UpSetAltair(
     color_range : list of str
         List of colors for the sets. Defaults to a colorblind-friendly palette.
     highlight_color : str, default "#EA4667"
-        Color used for highlighting on hover.
+        Color used for highlighting on hover or programmatic highlighting.
+    highlight : str, int, or list of int, optional
+        Specifies which intersections to highlight programmatically:
+        - None (default): interactive hover highlighting
+        - "least": highlight the intersection with the smallest size
+        - "greatest": highlight the intersection with the largest size
+        - int: highlight the intersection at the specified index (0-based)
+        - list of int: highlight multiple intersections by their indices
     glyph_size : int, default 200
         Size of the matrix glyphs in pixels.
     set_label_bg_size : int, default 1000
@@ -200,6 +208,18 @@ def UpSetAltair(
         raise ValueError("if provided, abbre must have the same length as sets")
     if vertical_bar_y_axis_orient not in ["left", "right"]:
         raise ValueError("vertical bar y axis orient must be 'left' or 'right'")
+    if highlight is not None:
+        if isinstance(highlight, str):
+            if highlight not in ["least", "greatest"]:
+                raise ValueError("highlight string must be 'least' or 'greatest'")
+        elif isinstance(highlight, int):
+            if highlight < 0:
+                raise ValueError("highlight index must be non-negative")
+        elif isinstance(highlight, list):
+            if not all(isinstance(i, int) and i >= 0 for i in highlight):
+                raise ValueError("highlight list must contain non-negative integers")
+        else:
+            raise TypeError("highlight must be None, str, int, or list of int")
 
     # Apply theme if specified
     if theme is not None:
@@ -210,9 +230,51 @@ def UpSetAltair(
         data, sets, abbre, sort_order
     )
 
+    # Determine which intersections to highlight
+    highlighted_intersection_ids = []
+    if highlight is not None:
+        # Get unique intersections with their counts
+        intersections = (
+            data.groupby("intersection_id")
+            .agg({"count": "first"})
+            .reset_index()
+            .sort_index()
+        )
+
+        if isinstance(highlight, str):
+            if highlight == "least":
+                # Find intersection with smallest count
+                min_idx = intersections["count"].idxmin()
+                highlighted_intersection_ids = [intersections.loc[min_idx, "intersection_id"]]
+            elif highlight == "greatest":
+                # Find intersection with largest count
+                max_idx = intersections["count"].idxmax()
+                highlighted_intersection_ids = [intersections.loc[max_idx, "intersection_id"]]
+        elif isinstance(highlight, int):
+            # Highlight specific index
+            if highlight < len(intersections):
+                highlighted_intersection_ids = [intersections.iloc[highlight]["intersection_id"]]
+        elif isinstance(highlight, list):
+            # Highlight multiple indices
+            highlighted_intersection_ids = [
+                intersections.iloc[i]["intersection_id"]
+                for i in highlight
+                if i < len(intersections)
+            ]
+
     # Setup selections for interactivity
     legend_selection = alt.selection_point(fields=["set"], bind="legend")
-    color_selection = alt.selection_point(fields=["intersection_id"], on="mouseover")
+
+    # Setup color selection based on highlight parameter
+    if highlight is None:
+        # Default hover behavior
+        color_selection = alt.selection_point(fields=["intersection_id"], on="mouseover")
+    else:
+        # Fixed highlight based on specified criteria
+        color_selection = alt.selection_point(
+            fields=["intersection_id"],
+            value=[{"intersection_id": id_} for id_ in highlighted_intersection_ids]
+        )
 
     # Calculate dimensions
     if horizontal_bar_chart_width is None:

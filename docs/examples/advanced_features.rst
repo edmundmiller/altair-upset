@@ -92,3 +92,75 @@ Let's analyze the engagement patterns across different platform combinations:
         print(f"Avg Time: {row['avg_time']:.1f} minutes")
         print(f"Avg Posts: {row['avg_posts']:.1f} per week")
         print(f"Avg Engagement: {row['avg_engagement']:.1f}%")
+
+Programmatic Highlighting
+-------------------------
+
+You can programmatically highlight specific intersections using the ``highlight`` parameter.
+This is useful for drawing attention to specific patterns without requiring user interaction.
+
+Highlighting the Largest Intersection
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Highlight the intersection with the most users:
+
+.. altair-plot::
+
+    au.UpSetAltair(
+        data=data,
+        sets=platforms,
+        title="Social Media Platform Usage - Largest Intersection Highlighted",
+        highlight="greatest",
+        width=800,
+        height=500
+    ).chart
+
+Highlighting the Smallest Intersection
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Highlight the intersection with the fewest users:
+
+.. altair-plot::
+
+    au.UpSetAltair(
+        data=data,
+        sets=platforms,
+        title="Social Media Platform Usage - Smallest Intersection Highlighted",
+        highlight="least",
+        width=800,
+        height=500
+    ).chart
+
+Highlighting Specific Intersections by Index
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Highlight specific intersections by their index (0-based):
+
+.. altair-plot::
+
+    # Highlight the first intersection
+    au.UpSetAltair(
+        data=data,
+        sets=platforms,
+        title="Social Media Platform Usage - First Intersection Highlighted",
+        highlight=0,
+        width=800,
+        height=500
+    ).chart
+
+Highlighting Multiple Intersections
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Highlight multiple intersections at once:
+
+.. altair-plot::
+
+    # Highlight the first three intersections
+    au.UpSetAltair(
+        data=data,
+        sets=platforms,
+        title="Social Media Platform Usage - Multiple Intersections Highlighted",
+        highlight=[0, 1, 2],
+        width=800,
+        height=500
+    ).chart
