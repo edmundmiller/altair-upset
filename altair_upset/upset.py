@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
 
 import altair as alt
 import pandas as pd
@@ -7,6 +7,51 @@ from .components import create_horizontal_bar, create_matrix_view, create_vertic
 from .config import upsetaltair_top_level_configuration
 from .preprocessing import preprocess_data
 from .transforms import create_base_chart
+
+
+def _determine_highlighted_intersections(
+    data: pd.DataFrame,
+    highlight: Union[Literal["least", "greatest"], int, List[int]],
+) -> List[float]:
+    """Determine which intersection IDs to highlight based on the highlight parameter.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        The preprocessed data with intersection_id and count columns
+    highlight : "least", "greatest", int, or list of int
+        The highlighting criteria
+
+    Returns
+    -------
+    list of float
+        List of intersection_ids to highlight
+    """
+    # Get unique intersections with their counts
+    intersections = (
+        data.groupby("intersection_id")["count"]
+        .first()
+        .reset_index()
+        .sort_index()
+    )
+
+    if isinstance(highlight, str):
+        if highlight == "least":
+            min_idx = intersections["count"].idxmin()
+            return [intersections.loc[min_idx, "intersection_id"]]
+        else:  # highlight == "greatest"
+            max_idx = intersections["count"].idxmax()
+            return [intersections.loc[max_idx, "intersection_id"]]
+    elif isinstance(highlight, int):
+        if highlight < len(intersections):
+            return [intersections.iloc[highlight]["intersection_id"]]
+        return []
+    else:  # isinstance(highlight, list)
+        return [
+            intersections.iloc[i]["intersection_id"]
+            for i in highlight
+            if i < len(intersections)
+        ]
 
 
 class UpSetChart:
@@ -84,7 +129,7 @@ def UpSetAltair(
         "#BDC6CA",
     ],
     highlight_color: str = "#EA4667",
-    highlight: Optional[Union[str, int, List[int]]] = None,
+    highlight: Optional[Union[Literal["least", "greatest"], int, List[int]]] = None,
     glyph_size: int = 100,  # Reduced from 200
     set_label_bg_size: int = 500,  # Reduced from 1000
     line_connection_size: int = 1,  # Reduced from 2
@@ -230,38 +275,6 @@ def UpSetAltair(
         data, sets, abbre, sort_order
     )
 
-    # Determine which intersections to highlight
-    highlighted_intersection_ids = []
-    if highlight is not None:
-        # Get unique intersections with their counts
-        intersections = (
-            data.groupby("intersection_id")
-            .agg({"count": "first"})
-            .reset_index()
-            .sort_index()
-        )
-
-        if isinstance(highlight, str):
-            if highlight == "least":
-                # Find intersection with smallest count
-                min_idx = intersections["count"].idxmin()
-                highlighted_intersection_ids = [intersections.loc[min_idx, "intersection_id"]]
-            elif highlight == "greatest":
-                # Find intersection with largest count
-                max_idx = intersections["count"].idxmax()
-                highlighted_intersection_ids = [intersections.loc[max_idx, "intersection_id"]]
-        elif isinstance(highlight, int):
-            # Highlight specific index
-            if highlight < len(intersections):
-                highlighted_intersection_ids = [intersections.iloc[highlight]["intersection_id"]]
-        elif isinstance(highlight, list):
-            # Highlight multiple indices
-            highlighted_intersection_ids = [
-                intersections.iloc[i]["intersection_id"]
-                for i in highlight
-                if i < len(intersections)
-            ]
-
     # Setup selections for interactivity
     legend_selection = alt.selection_point(fields=["set"], bind="legend")
 
@@ -270,10 +283,11 @@ def UpSetAltair(
         # Default hover behavior
         color_selection = alt.selection_point(fields=["intersection_id"], on="mouseover")
     else:
-        # Fixed highlight based on specified criteria
+        # Determine which intersections to highlight and create fixed selection
+        highlighted_ids = _determine_highlighted_intersections(data, highlight)
         color_selection = alt.selection_point(
             fields=["intersection_id"],
-            value=[{"intersection_id": id_} for id_ in highlighted_intersection_ids]
+            value=[{"intersection_id": id_} for id_ in highlighted_ids]
         )
 
     # Calculate dimensions
