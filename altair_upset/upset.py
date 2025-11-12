@@ -26,6 +26,13 @@ def _determine_highlighted_intersections(
     -------
     list of float
         List of intersection_ids to highlight
+
+    Raises
+    ------
+    IndexError
+        If a single integer index is out of bounds
+    ValueError
+        If any index in a list is out of bounds
     """
     # Get unique intersections with their counts
     intersections = (
@@ -43,15 +50,21 @@ def _determine_highlighted_intersections(
             max_idx = intersections["count"].idxmax()
             return [intersections.loc[max_idx, "intersection_id"]]
     elif isinstance(highlight, int):
-        if highlight < len(intersections):
-            return [intersections.iloc[highlight]["intersection_id"]]
-        return []
+        if highlight >= len(intersections):
+            raise IndexError(
+                f"highlight index {highlight} is out of bounds for "
+                f"{len(intersections)} intersections"
+            )
+        return [intersections.iloc[highlight]["intersection_id"]]
     else:  # isinstance(highlight, list)
-        return [
-            intersections.iloc[i]["intersection_id"]
-            for i in highlight
-            if i < len(intersections)
-        ]
+        # Validate all indices first
+        invalid_indices = [i for i in highlight if i >= len(intersections)]
+        if invalid_indices:
+            raise ValueError(
+                f"highlight indices {invalid_indices} are out of bounds for "
+                f"{len(intersections)} intersections"
+            )
+        return [intersections.iloc[i]["intersection_id"] for i in highlight]
 
 
 class UpSetChart:
