@@ -35,6 +35,31 @@ def basic_chart(sample_data):
     return au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], title="Test Chart")
 
 
+def _get_color_selection_param(chart):
+    """Helper to extract the color selection parameter from a chart.
+
+    Parameters
+    ----------
+    chart : UpSetChart
+        The chart to extract the parameter from
+
+    Returns
+    -------
+    dict or None
+        The color selection parameter, or None if not found
+    """
+    spec = chart.chart.to_dict()
+    params = spec.get("params", [])
+
+    return next(
+        (p for p in params
+         if "select" in p and "fields" in p["select"]
+         and "intersection_id" in p["select"]["fields"]
+         and "value" in p),
+        None
+    )
+
+
 def test_basic_chart_structure(basic_chart):
     """Test that the basic chart has all required components."""
     # The chart should be a VConcatChart (vertical concatenation)
@@ -228,18 +253,7 @@ def test_highlight_least(sample_data):
     ]
 
     # Extract actual highlighted intersection from chart spec
-    spec = chart.chart.to_dict()
-    params = spec.get("params", [])
-
-    # Find the color_selection parameter (has intersection_id field)
-    color_param = next(
-        (p for p in params
-         if "select" in p and "fields" in p["select"]
-         and "intersection_id" in p["select"]["fields"]
-         and "value" in p),
-        None
-    )
-
+    color_param = _get_color_selection_param(chart)
     assert color_param is not None, "No selection parameter with intersection_id found"
 
     # Verify the correct intersection is highlighted
@@ -274,18 +288,7 @@ def test_highlight_greatest(sample_data):
     ]
 
     # Extract actual highlighted intersection from chart spec
-    spec = chart.chart.to_dict()
-    params = spec.get("params", [])
-
-    # Find the color_selection parameter
-    color_param = next(
-        (p for p in params
-         if "select" in p and "fields" in p["select"]
-         and "intersection_id" in p["select"]["fields"]
-         and "value" in p),
-        None
-    )
-
+    color_param = _get_color_selection_param(chart)
     assert color_param is not None, "No selection parameter with intersection_id found"
 
     # Verify the correct intersection is highlighted
@@ -319,18 +322,7 @@ def test_highlight_specific_index(sample_data):
     expected_id = intersections.iloc[0]["intersection_id"]
 
     # Extract actual highlighted intersection from chart spec
-    spec = chart.chart.to_dict()
-    params = spec.get("params", [])
-
-    # Find the color_selection parameter
-    color_param = next(
-        (p for p in params
-         if "select" in p and "fields" in p["select"]
-         and "intersection_id" in p["select"]["fields"]
-         and "value" in p),
-        None
-    )
-
+    color_param = _get_color_selection_param(chart)
     assert color_param is not None, "No selection parameter with intersection_id found"
 
     # Verify the correct intersection is highlighted
@@ -360,18 +352,7 @@ def test_highlight_multiple_indices(sample_data):
     ]
 
     # Extract actual highlighted intersections from chart spec
-    spec = chart.chart.to_dict()
-    params = spec.get("params", [])
-
-    # Find the color_selection parameter
-    color_param = next(
-        (p for p in params
-         if "select" in p and "fields" in p["select"]
-         and "intersection_id" in p["select"]["fields"]
-         and "value" in p),
-        None
-    )
-
+    color_param = _get_color_selection_param(chart)
     assert color_param is not None, "No selection parameter with intersection_id found"
 
     # Verify the correct intersections are highlighted
@@ -423,3 +404,15 @@ def test_highlight_invalid_type(sample_data):
     """Test that invalid types for highlight raise TypeError."""
     with pytest.raises(TypeError, match="highlight must be None, str, int, or list of int"):
         au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], highlight=1.5)
+
+
+def test_highlight_index_out_of_bounds(sample_data):
+    """Test that out of bounds single index raises IndexError."""
+    with pytest.raises(IndexError, match="highlight index .* is out of bounds"):
+        au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], highlight=999)
+
+
+def test_highlight_list_indices_out_of_bounds(sample_data):
+    """Test that out of bounds indices in list raise ValueError."""
+    with pytest.raises(ValueError, match="highlight indices .* are out of bounds"):
+        au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], highlight=[0, 1, 999])
