@@ -294,13 +294,15 @@ def UpSetAltair(
     # Setup color selection based on highlight parameter
     if highlight is None:
         # Default hover behavior
-        color_selection = alt.selection_point(fields=["intersection_id"], on="mouseover")
+        color_selection = alt.selection_point(
+            fields=["intersection_id"], on="mouseover"
+        )
     else:
         # Determine which intersections to highlight and create fixed selection
         highlighted_ids = _determine_highlighted_intersections(data, highlight)
         color_selection = alt.selection_point(
             fields=["intersection_id"],
-            value=[{"intersection_id": id_} for id_ in highlighted_ids]
+            value=[{"intersection_id": id_} for id_ in highlighted_ids],
         )
 
     # Calculate dimensions
