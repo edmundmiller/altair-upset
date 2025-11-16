@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Vertical orientation support with new `orientation` parameter
+  - Horizontal orientation (default): cardinality bars on top (vertical), set sizes on right (horizontal)
+  - Vertical orientation: cardinality bars on left (horizontal), set sizes on top (vertical)
+  - Vertical layouts are ideal for interactive plots that can be scrolled
+  - Horizontal layouts are best for static figures in papers
+- Enhanced test normalization for auto-generated parameter and view names
+- Comprehensive test suite for vertical orientation feature (6 new tests)
+
+### Changed
+
+- Updated component functions to support both horizontal and vertical orientations
+- Improved layout logic to handle orientation-specific rendering
+
 ## [0.4.0] - 2025-01-20
 
 ### Added

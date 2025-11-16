@@ -18,6 +18,7 @@ Create beautiful and interactive UpSet plots using Altair. UpSet plots are a pow
 - 🎨 Customizable colors, sizes, and themes
 - 🔍 Tooltips with detailed intersection information
 - 🚀 Support for both Pandas and Polars DataFrames
+- 📐 Horizontal and vertical layout orientations for different use cases
 
 ## Installation
 
@@ -135,6 +136,23 @@ chart = au.UpSetAltair(
     abbre=["S1", "S2", "S3"]
 )
 ```
+
+### Vertical Orientation
+
+```python
+# Use vertical orientation for interactive plots that can be scrolled
+# Vertical layouts display cardinality horizontally (on the left)
+# and set sizes vertically (on top)
+chart = au.UpSetAltair(
+    data=data,
+    sets=["set1", "set2", "set3"],
+    orientation="vertical"  # Default is "horizontal"
+)
+```
+
+The matrix can be sorted in various ways - by cardinality (size), degree, or sets. UpSet works well in both orientations:
+- **Vertical layouts** are better for interactive UpSet plots that can be scrolled
+- **Horizontal layouts** (default) are best for figures in papers
 
 ## Development
 
