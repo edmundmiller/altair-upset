@@ -258,9 +258,12 @@ def test_highlight_least(sample_data):
 
     # Verify the correct intersection is highlighted
     actual_ids = [v["intersection_id"] for v in color_param["value"]]
-    assert len(actual_ids) == 1, f"Expected 1 highlighted intersection, got {len(actual_ids)}"
+    assert len(actual_ids) == 1, (
+        f"Expected 1 highlighted intersection, got {len(actual_ids)}"
+    )
     assert actual_ids[0] == expected_min_id, (
-        f"Expected intersection {expected_min_id} (smallest), but got {actual_ids[0]}"
+        f"Expected intersection {expected_min_id} (smallest), "
+        f"but got {actual_ids[0]}"
     )
 
     # Verify it's actually the minimum count
@@ -293,9 +296,12 @@ def test_highlight_greatest(sample_data):
 
     # Verify the correct intersection is highlighted
     actual_ids = [v["intersection_id"] for v in color_param["value"]]
-    assert len(actual_ids) == 1, f"Expected 1 highlighted intersection, got {len(actual_ids)}"
+    assert len(actual_ids) == 1, (
+        f"Expected 1 highlighted intersection, got {len(actual_ids)}"
+    )
     assert actual_ids[0] == expected_max_id, (
-        f"Expected intersection {expected_max_id} (largest), but got {actual_ids[0]}"
+        f"Expected intersection {expected_max_id} (largest), "
+        f"but got {actual_ids[0]}"
     )
 
     # Verify it's actually the maximum count
@@ -327,9 +333,12 @@ def test_highlight_specific_index(sample_data):
 
     # Verify the correct intersection is highlighted
     actual_ids = [v["intersection_id"] for v in color_param["value"]]
-    assert len(actual_ids) == 1, f"Expected 1 highlighted intersection, got {len(actual_ids)}"
+    assert len(actual_ids) == 1, (
+        f"Expected 1 highlighted intersection, got {len(actual_ids)}"
+    )
     assert actual_ids[0] == expected_id, (
-        f"Expected intersection {expected_id} at index 0, but got {actual_ids[0]}"
+        f"Expected intersection {expected_id} at index 0, "
+        f"but got {actual_ids[0]}"
     )
 
 
@@ -357,7 +366,9 @@ def test_highlight_multiple_indices(sample_data):
 
     # Verify the correct intersections are highlighted
     actual_ids = [v["intersection_id"] for v in color_param["value"]]
-    assert len(actual_ids) == 3, f"Expected 3 highlighted intersections, got {len(actual_ids)}"
+    assert len(actual_ids) == 3, (
+        f"Expected 3 highlighted intersections, got {len(actual_ids)}"
+    )
     assert set(actual_ids) == set(expected_ids), (
         f"Expected intersections {expected_ids}, but got {actual_ids}"
     )
@@ -382,7 +393,9 @@ def test_highlight_none_default_hover(sample_data):
 
 def test_highlight_invalid_string(sample_data):
     """Test that invalid string values for highlight raise ValueError."""
-    with pytest.raises(ValueError, match="highlight string must be 'least' or 'greatest'"):
+    with pytest.raises(
+        ValueError, match="highlight string must be 'least' or 'greatest'"
+    ):
         au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], highlight="invalid")
 
 
@@ -402,7 +415,9 @@ def test_highlight_invalid_list(sample_data):
 
 def test_highlight_invalid_type(sample_data):
     """Test that invalid types for highlight raise TypeError."""
-    with pytest.raises(TypeError, match="highlight must be None, str, int, or list of int"):
+    with pytest.raises(
+        TypeError, match="highlight must be None, str, int, or list of int"
+    ):
         au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], highlight=1.5)
 
 
