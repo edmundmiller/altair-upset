@@ -218,6 +218,10 @@ def normalize_spec(spec):
     if "$schema" in spec:
         spec["$schema"] = "https://vega.github.io/schema/vega-lite/v4.json"
 
+    # Track view name mappings and param name mappings
+    view_counter = {}
+    param_mapping = {}
+
     def normalize_data(d):
         if isinstance(d, dict):
             # Remove data and datasets as they might have different orders
@@ -238,6 +242,38 @@ def normalize_spec(spec):
                 # For string selections, just normalize to a fixed value
                 elif isinstance(d["selection"], str):
                     d["selection"] = "selector000"
+
+            # Normalize params - replace param_N names with param_0, param_1, etc.
+            if "params" in d and isinstance(d["params"], list):
+                for i, param in enumerate(d["params"]):
+                    if isinstance(param, dict) and "name" in param:
+                        old_name = param["name"]
+                        new_name = f"param_{i}"
+                        param_mapping[old_name] = new_name
+                        param["name"] = new_name
+
+            # Normalize param references in filters
+            if "param" in d and isinstance(d["param"], str):
+                if d["param"] in param_mapping:
+                    d["param"] = param_mapping[d["param"]]
+
+            # Normalize view names
+            if "name" in d and isinstance(d["name"], str) and d["name"].startswith("view_"):
+                if d["name"] not in view_counter:
+                    view_counter[d["name"]] = f"view_{len(view_counter)}"
+                d["name"] = view_counter[d["name"]]
+
+            # Normalize views - replace view_N names with view_0, view_1, etc.
+            if "views" in d and isinstance(d["views"], list):
+                normalized_views = []
+                for view_name in d["views"]:
+                    if isinstance(view_name, str) and view_name.startswith("view_"):
+                        if view_name not in view_counter:
+                            view_counter[view_name] = f"view_{len(view_counter)}"
+                        normalized_views.append(view_counter[view_name])
+                    else:
+                        normalized_views.append(view_name)
+                d["views"] = normalized_views
 
             return {k: normalize_data(v) for k, v in sorted(d.items())}
         elif isinstance(d, list):

@@ -36,7 +36,7 @@
   "params": [
     {
       "bind": "legend",
-      "name": "param_35",
+      "name": "param_1",
       "select": {
         "fields": [
           "set"
@@ -44,14 +44,14 @@
         "type": "point"
       },
       "views": [
-        "view_65",
-        "view_66",
-        "view_67",
-        "view_68"
+        "view_0",
+        "view_1",
+        "view_2",
+        "view_3"
       ]
     },
     {
-      "name": "param_36",
+      "name": "param_0",
       "select": {
         "fields": [
           "intersection_id"
@@ -60,8 +60,8 @@
         "type": "point"
       },
       "views": [
-        "view_65",
-        "view_66"
+        "view_0",
+        "view_1"
       ]
     }
   ],
@@ -142,7 +142,7 @@
             "size": 20,
             "type": "bar"
           },
-          "name": "view_68",
+          "name": "view_3",
           "transform": [
             {
               "aggregate": [
@@ -195,12 +195,12 @@
             },
             {
               "filter": {
-                "param": "param_35"
+                "param": "param_1"
               }
             },
             {
               "filter": {
-                "param": "param_35"
+                "param": "param_1"
               }
             },
             {
@@ -272,7 +272,7 @@
                   "condition": {
                     "test": {
                       "not": {
-                        "param": "param_36"
+                        "param": "param_0"
                       }
                     },
                     "value": "#3A3A3A"
@@ -323,7 +323,7 @@
                 "size": 100,
                 "type": "circle"
               },
-              "name": "view_66",
+              "name": "view_1",
               "transform": [
                 {
                   "aggregate": [
@@ -376,12 +376,12 @@
                 },
                 {
                   "filter": {
-                    "param": "param_35"
+                    "param": "param_1"
                   }
                 },
                 {
                   "filter": {
-                    "param": "param_35"
+                    "param": "param_1"
                   }
                 },
                 {
@@ -450,7 +450,7 @@
                   "condition": {
                     "test": {
                       "not": {
-                        "param": "param_36"
+                        "param": "param_0"
                       }
                     },
                     "value": "#3A3A3A"
@@ -553,12 +553,12 @@
                 },
                 {
                   "filter": {
-                    "param": "param_35"
+                    "param": "param_1"
                   }
                 },
                 {
                   "filter": {
-                    "param": "param_35"
+                    "param": "param_1"
                   }
                 },
                 {
@@ -627,7 +627,7 @@
                   "condition": {
                     "test": {
                       "not": {
-                        "param": "param_36"
+                        "param": "param_0"
                       }
                     },
                     "value": "#3A3A3A"
@@ -728,12 +728,12 @@
                 },
                 {
                   "filter": {
-                    "param": "param_35"
+                    "param": "param_1"
                   }
                 },
                 {
                   "filter": {
-                    "param": "param_35"
+                    "param": "param_1"
                   }
                 },
                 {
@@ -894,12 +894,12 @@
                 },
                 {
                   "filter": {
-                    "param": "param_35"
+                    "param": "param_1"
                   }
                 },
                 {
                   "filter": {
-                    "param": "param_35"
+                    "param": "param_1"
                   }
                 },
                 {
@@ -1061,12 +1061,12 @@
                 },
                 {
                   "filter": {
-                    "param": "param_35"
+                    "param": "param_1"
                   }
                 },
                 {
                   "filter": {
-                    "param": "param_35"
+                    "param": "param_1"
                   }
                 },
                 {
@@ -1186,7 +1186,7 @@
                 "size": 650,
                 "type": "circle"
               },
-              "name": "view_67",
+              "name": "view_2",
               "transform": [
                 {
                   "aggregate": [
@@ -1236,12 +1236,12 @@
                 },
                 {
                   "filter": {
-                    "param": "param_35"
+                    "param": "param_1"
                   }
                 },
                 {
                   "filter": {
-                    "param": "param_35"
+                    "param": "param_1"
                   }
                 },
                 {
@@ -1381,12 +1381,12 @@
                 },
                 {
                   "filter": {
-                    "param": "param_35"
+                    "param": "param_1"
                   }
                 },
                 {
                   "filter": {
-                    "param": "param_35"
+                    "param": "param_1"
                   }
                 },
                 {
@@ -1470,7 +1470,7 @@
               "condition": {
                 "test": {
                   "not": {
-                    "param": "param_36"
+                    "param": "param_0"
                   }
                 },
                 "value": "#3A3A3A"
@@ -1576,12 +1576,12 @@
             },
             {
               "filter": {
-                "param": "param_35"
+                "param": "param_1"
               }
             },
             {
               "filter": {
-                "param": "param_35"
+                "param": "param_1"
               }
             },
             {
@@ -1650,7 +1650,7 @@
               "condition": {
                 "test": {
                   "not": {
-                    "param": "param_36"
+                    "param": "param_0"
                   }
                 },
                 "value": "#3A3A3A"
@@ -1701,7 +1701,7 @@
             "size": 30,
             "type": "bar"
           },
-          "name": "view_65",
+          "name": "view_0",
           "transform": [
             {
               "aggregate": [
@@ -1751,12 +1751,12 @@
             },
             {
               "filter": {
-                "param": "param_35"
+                "param": "param_1"
               }
             },
             {
               "filter": {
-                "param": "param_35"
+                "param": "param_1"
               }
             },
             {

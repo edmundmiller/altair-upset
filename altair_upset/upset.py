@@ -36,10 +36,7 @@ def _determine_highlighted_intersections(
     """
     # Get unique intersections with their counts
     intersections = (
-        data.groupby("intersection_id")["count"]
-        .first()
-        .reset_index()
-        .sort_index()
+        data.groupby("intersection_id")["count"].first().reset_index().sort_index()
     )
 
     if isinstance(highlight, str):
@@ -129,6 +126,7 @@ def UpSetAltair(
     abbre: Optional[List[str]] = None,
     sort_by: str = "frequency",
     sort_order: str = "ascending",
+    orientation: str = "horizontal",
     width: int = 1200,
     height: int = 700,
     height_ratio: float = 0.6,
@@ -178,6 +176,10 @@ def UpSetAltair(
         - "degree": sort by number of sets in intersection
     sort_order : {"ascending", "descending"}, default "ascending"
         Order of sorting for intersections.
+    orientation : {"horizontal", "vertical"}, default "horizontal"
+        Orientation of the plot:
+        - "horizontal": cardinality bars are vertical (top), set sizes are horizontal (right)
+        - "vertical": cardinality bars are horizontal (left), set sizes are vertical (top)
     width : int, default 1200
         Total width of the plot in pixels.
     height : int, default 700
@@ -278,6 +280,8 @@ def UpSetAltair(
                 raise ValueError("highlight list must contain non-negative integers")
         else:
             raise TypeError("highlight must be None, str, int, or list of int")
+    if orientation not in ["horizontal", "vertical"]:
+        raise ValueError("orientation must be either 'horizontal' or 'vertical'")
 
     # Apply theme if specified
     if theme is not None:
@@ -352,6 +356,7 @@ def UpSetAltair(
         tooltip,
         vertical_bar_label_size,
         vertical_bar_y_axis_orient,
+        orientation,
     )
     vertical_bar_chart = (
         (vertical_bar + vertical_bar_text)
@@ -367,6 +372,7 @@ def UpSetAltair(
         brush_color,
         line_connection_size,
         main_color,
+        orientation,
     )
     matrix_view = (
         (circle + rect_bg + circle_bg + line_connection + circle)
@@ -384,25 +390,51 @@ def UpSetAltair(
             horizontal_bar_label_bg_color,
             horizontal_bar_size,
             horizontal_bar_chart_width,
+            orientation,
         )
     )
     horizontal_bar_axis = (
         (horizontal_bar_label_bg + horizontal_bar_label)
         if is_show_horizontal_bar_label_bg
         else horizontal_bar_label
-    ).properties(width=horizontal_bar_chart_width)
+    ).properties(
+        width=horizontal_bar_chart_width
+        if orientation == "horizontal"
+        else matrix_width
+    )
 
-    # Combine components
-    upsetaltair = alt.vconcat(
-        vertical_bar_chart,
-        alt.hconcat(
-            matrix_view,
-            horizontal_bar_axis,
-            horizontal_bar.properties(width=horizontal_bar_chart_width),
-            spacing=0,  # Minimize spacing between components
-        ).resolve_scale(x="shared", y="shared"),  # X shared also
-        spacing=5,
-    ).add_params(legend_selection)
+    # Combine components based on orientation
+    if orientation == "horizontal":
+        # Horizontal layout: cardinality bars on top, set sizes on right
+        upsetaltair = alt.vconcat(
+            vertical_bar_chart,
+            alt.hconcat(
+                matrix_view,
+                horizontal_bar_axis,
+                horizontal_bar.properties(width=horizontal_bar_chart_width),
+                spacing=0,
+            ).resolve_scale(x="shared", y="shared"),
+            spacing=5,
+        ).add_params(legend_selection)
+    else:
+        # Vertical layout: cardinality bars on left, set sizes on top
+        upsetaltair = alt.hconcat(
+            vertical_bar_chart.properties(
+                width=vertical_bar_chart_height, height=matrix_height
+            ),
+            alt.vconcat(
+                alt.hconcat(
+                    horizontal_bar_axis,
+                    horizontal_bar.properties(
+                        width=matrix_width, height=horizontal_bar_chart_width
+                    ),
+                    spacing=0,
+                ).resolve_scale(x="shared", y="shared"),
+                matrix_view.properties(height=matrix_height),
+                spacing=5,
+            ),
+            spacing=5,
+        ).add_params(legend_selection)
 
     # Apply configuration
     chart = upsetaltair_top_level_configuration(

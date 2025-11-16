@@ -52,11 +52,15 @@ def _get_color_selection_param(chart):
     params = spec.get("params", [])
 
     return next(
-        (p for p in params
-         if "select" in p and "fields" in p["select"]
-         and "intersection_id" in p["select"]["fields"]
-         and "value" in p),
-        None
+        (
+            p
+            for p in params
+            if "select" in p
+            and "fields" in p["select"]
+            and "intersection_id" in p["select"]["fields"]
+            and "value" in p
+        ),
+        None,
     )
 
 
@@ -244,9 +248,7 @@ def test_highlight_least(sample_data):
     # Calculate the expected result independently from the processed data
     processed_data = chart.data
     intersection_counts = (
-        processed_data.groupby("intersection_id")["count"]
-        .first()
-        .reset_index()
+        processed_data.groupby("intersection_id")["count"].first().reset_index()
     )
     expected_min_id = intersection_counts.loc[
         intersection_counts["count"].idxmin(), "intersection_id"
@@ -262,8 +264,7 @@ def test_highlight_least(sample_data):
         f"Expected 1 highlighted intersection, got {len(actual_ids)}"
     )
     assert actual_ids[0] == expected_min_id, (
-        f"Expected intersection {expected_min_id} (smallest), "
-        f"but got {actual_ids[0]}"
+        f"Expected intersection {expected_min_id} (smallest), but got {actual_ids[0]}"
     )
 
     # Verify it's actually the minimum count
@@ -282,9 +283,7 @@ def test_highlight_greatest(sample_data):
     # Calculate the expected result independently from the processed data
     processed_data = chart.data
     intersection_counts = (
-        processed_data.groupby("intersection_id")["count"]
-        .first()
-        .reset_index()
+        processed_data.groupby("intersection_id")["count"].first().reset_index()
     )
     expected_max_id = intersection_counts.loc[
         intersection_counts["count"].idxmax(), "intersection_id"
@@ -300,8 +299,7 @@ def test_highlight_greatest(sample_data):
         f"Expected 1 highlighted intersection, got {len(actual_ids)}"
     )
     assert actual_ids[0] == expected_max_id, (
-        f"Expected intersection {expected_max_id} (largest), "
-        f"but got {actual_ids[0]}"
+        f"Expected intersection {expected_max_id} (largest), but got {actual_ids[0]}"
     )
 
     # Verify it's actually the maximum count
@@ -337,8 +335,7 @@ def test_highlight_specific_index(sample_data):
         f"Expected 1 highlighted intersection, got {len(actual_ids)}"
     )
     assert actual_ids[0] == expected_id, (
-        f"Expected intersection {expected_id} at index 0, "
-        f"but got {actual_ids[0]}"
+        f"Expected intersection {expected_id} at index 0, but got {actual_ids[0]}"
     )
 
 
@@ -357,7 +354,7 @@ def test_highlight_multiple_indices(sample_data):
     expected_ids = [
         intersections.iloc[0]["intersection_id"],
         intersections.iloc[1]["intersection_id"],
-        intersections.iloc[2]["intersection_id"]
+        intersections.iloc[2]["intersection_id"],
     ]
 
     # Extract actual highlighted intersections from chart spec
@@ -431,3 +428,85 @@ def test_highlight_list_indices_out_of_bounds(sample_data):
     """Test that out of bounds indices in list raise ValueError."""
     with pytest.raises(ValueError, match="highlight indices .* are out of bounds"):
         au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], highlight=[0, 1, 999])
+
+
+def test_vertical_orientation_structure(sample_data):
+    """Test that vertical orientation creates correct chart structure."""
+    chart = au.UpSetAltair(
+        data=sample_data, sets=["A", "B", "C"], orientation="vertical"
+    )
+
+    # The chart should be an HConcatChart (horizontal concatenation) for vertical orientation
+    assert isinstance(chart.chart, alt.HConcatChart)
+
+    # Should have cardinality bars on left and matrix/set sizes on right
+    assert len(chart.chart.hconcat) == 2
+
+
+def test_vertical_orientation_cardinality_encoding(sample_data):
+    """Test that vertical orientation swaps cardinality axes correctly."""
+    chart = au.UpSetAltair(
+        data=sample_data, sets=["A", "B", "C"], orientation="vertical"
+    )
+
+    # Get the cardinality bar chart component (first hconcat element)
+    cardinality_bar = chart.chart.hconcat[0]
+    first_layer = cardinality_bar.layer[0]
+
+    # In vertical orientation, cardinality should be on X-axis
+    encoding_dict = first_layer.encoding.to_dict()
+    assert encoding_dict["x"]["field"] == "count"
+    assert encoding_dict["y"]["field"] == "intersection_id"
+
+
+def test_vertical_orientation_set_size_encoding(sample_data):
+    """Test that vertical orientation swaps set size axes correctly."""
+    chart = au.UpSetAltair(
+        data=sample_data, sets=["A", "B", "C"], orientation="vertical"
+    )
+
+    # Get the vconcat component (right side), then the horizontal bar (top part)
+    vconcat_part = chart.chart.hconcat[1]
+    hconcat_part = vconcat_part.vconcat[0]
+    set_size_bar = hconcat_part.hconcat[-1]
+
+    # In vertical orientation, set sizes should be on Y-axis
+    encoding_dict = set_size_bar.encoding.to_dict()
+    assert encoding_dict["y"]["field"] == "count"
+    assert encoding_dict["x"]["field"] == "set_order"
+
+
+def test_vertical_orientation_matrix_encoding(sample_data):
+    """Test that vertical orientation swaps matrix axes correctly."""
+    chart = au.UpSetAltair(
+        data=sample_data, sets=["A", "B", "C"], orientation="vertical"
+    )
+
+    # Get the vconcat component (right side), then the matrix (bottom part)
+    vconcat_part = chart.chart.hconcat[1]
+    matrix_view = vconcat_part.vconcat[1]
+
+    # In vertical orientation, matrix should have X=set_order, Y=intersection_id
+    encoding_dict = matrix_view.layer[0].encoding.to_dict()
+    assert encoding_dict["x"]["field"] == "set_order"
+    assert encoding_dict["y"]["field"] == "intersection_id"
+
+
+def test_horizontal_orientation_default(sample_data):
+    """Test that default orientation is horizontal."""
+    chart_default = au.UpSetAltair(data=sample_data, sets=["A", "B", "C"])
+    chart_explicit = au.UpSetAltair(
+        data=sample_data, sets=["A", "B", "C"], orientation="horizontal"
+    )
+
+    # Both should create VConcatChart
+    assert isinstance(chart_default.chart, alt.VConcatChart)
+    assert isinstance(chart_explicit.chart, alt.VConcatChart)
+
+
+def test_orientation_invalid_value(sample_data):
+    """Test that invalid values for orientation raise ValueError."""
+    with pytest.raises(
+        ValueError, match="orientation must be either 'horizontal' or 'vertical'"
+    ):
+        au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], orientation="diagonal")
