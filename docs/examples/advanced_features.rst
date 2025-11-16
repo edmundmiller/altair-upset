@@ -93,6 +93,7 @@ Let's analyze the engagement patterns across different platform combinations:
         print(f"Avg Posts: {row['avg_posts']:.1f} per week")
         print(f"Avg Engagement: {row['avg_engagement']:.1f}%")
 
+
 Programmatic Highlighting
 -------------------------
 
@@ -163,4 +164,63 @@ Highlight multiple intersections at once:
         highlight=[0, 1, 2],
         width=800,
         height=500
+    ).chart
+
+
+Vertical Orientation
+--------------------
+
+UpSet plots can be displayed in either horizontal or vertical orientation. The choice depends
+on your use case:
+
+- **Horizontal layouts** (default) are best for static figures in papers
+- **Vertical layouts** are better for interactive plots that can be scrolled
+
+In vertical orientation, the cardinality (intersection size) is displayed horizontally on the
+left, and set sizes are displayed vertically on top.
+
+.. altair-plot::
+
+    au.UpSetAltair(
+        data=data,
+        sets=platforms,
+        title="Social Media Platform Usage (Vertical Layout)",
+        subtitle="Better for interactive exploration with scrolling",
+        orientation="vertical",  # Use vertical orientation
+        width=700,
+        height=900
+    ).chart
+
+The matrix can be sorted in various ways - by cardinality (size), degree, or sets - and this
+works equally well in both orientations.
+
+Comparing Horizontal and Vertical Layouts
+------------------------------------------
+
+Here's a comparison showing the same data in both orientations:
+
+.. altair-plot::
+
+    # Horizontal orientation (default)
+    au.UpSetAltair(
+        data=data,
+        sets=platforms,
+        title="Horizontal Layout",
+        subtitle="Cardinality vertical (top), set sizes horizontal (right)",
+        orientation="horizontal",
+        width=800,
+        height=500
+    ).chart
+
+.. altair-plot::
+
+    # Vertical orientation
+    au.UpSetAltair(
+        data=data,
+        sets=platforms,
+        title="Vertical Layout",
+        subtitle="Cardinality horizontal (left), set sizes vertical (top)",
+        orientation="vertical",
+        width=600,
+        height=800
     ).chart
