@@ -89,13 +89,22 @@
       "hconcat": [
         {
           "encoding": {
-            "text": {
-              "value": ""
+            "x": {
+              "axis": null,
+              "field": "x",
+              "type": "quantitative"
+            },
+            "y": {
+              "axis": null,
+              "field": "y",
+              "type": "quantitative"
             }
           },
           "height": 240.0,
           "mark": {
-            "type": "text"
+            "opacity": 0,
+            "size": 0,
+            "type": "point"
           },
           "name": "view_3",
           "width": 120
@@ -561,11 +570,6 @@
           "width": 680
         }
       ],
-      "resolve": {
-        "scale": {
-          "x": "shared"
-        }
-      },
       "spacing": 0
     },
     {

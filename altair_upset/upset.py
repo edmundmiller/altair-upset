@@ -642,22 +642,18 @@ def UpSetVertical(
         .properties(width=cardinality_bar_width, height=matrix_height)
     )
 
-    # Create empty spacer for top-right area
+    # Create invisible spacer for top-right to balance layout
     spacer = (
-        alt.Chart(pd.DataFrame({"x": [0]}))
-        .mark_text()
-        .encode(text=alt.value(""))
+        alt.Chart(pd.DataFrame({"x": [0], "y": [0]}))
+        .mark_point(opacity=0, size=0)
+        .encode(x=alt.X("x:Q", axis=None), y=alt.Y("y:Q", axis=None))
         .properties(width=cardinality_bar_width, height=set_bar_height)
     )
 
     # Combine components vertically with cardinality bars
     upsetaltair = (
         alt.vconcat(
-            alt.hconcat(
-                set_bar_chart,
-                spacer,
-                spacing=0,
-            ).resolve_scale(x="shared"),
+            alt.hconcat(set_bar_chart, spacer, spacing=0),
             alt.hconcat(
                 matrix_view,
                 cardinality_bar_chart,
