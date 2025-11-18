@@ -164,7 +164,8 @@ def create_vertical_set_bars(
         .encode(
             y=alt.Y(
                 "sum(count):Q",
-                axis=alt.Axis(grid=False, tickCount=3),
+                axis=alt.Axis(grid=False, tickCount=3, domain=False),
+                scale=alt.Scale(zero=True),
                 title="Set Size",
             )
         )
@@ -223,3 +224,43 @@ def create_vertical_matrix(
     )
 
     return circle_bg, rect_bg, circle, line_connection
+
+
+def create_horizontal_cardinality_bar(
+    base,
+    cardinality_bar_width,
+    matrix_height,
+    main_color,
+    bar_size,
+    brush_color,
+    y_sort,
+    tooltip,
+    label_size,
+    x_axis_orient,
+):
+    """Creates horizontal cardinality bars for vertical upset plots.
+
+    Bars extend horizontally (left to right) showing intersection sizes,
+    aligned with matrix rows.
+    """
+    cardinality_bar = base.mark_bar(color=main_color, size=bar_size).encode(
+        y=alt.Y(
+            "intersection_id:N",
+            axis=alt.Axis(grid=False, labels=False, ticks=False, domain=True),
+            sort=y_sort,
+            title=None,
+        ),
+        x=alt.X(
+            "max(count):Q",
+            axis=alt.Axis(grid=False, tickCount=3, orient=x_axis_orient),
+            title="Intersection Size",
+        ),
+        color=brush_color,
+        tooltip=tooltip,
+    )
+
+    cardinality_bar_text = cardinality_bar.mark_text(
+        color=main_color, dx=10, size=label_size, align="left"
+    ).encode(text=alt.Text("count:Q", format=".0f"))
+
+    return cardinality_bar, cardinality_bar_text

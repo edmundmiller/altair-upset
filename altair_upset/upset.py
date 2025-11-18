@@ -5,6 +5,7 @@ import pandas as pd
 
 from .components import (
     create_horizontal_bar,
+    create_horizontal_cardinality_bar,
     create_matrix_view,
     create_vertical_bar,
     create_vertical_matrix,
@@ -450,6 +451,10 @@ def UpSetVertical(
     set_label_bg_size: int = 500,
     line_connection_size: int = 1,
     set_bar_size: int = 30,
+    cardinality_bar_width: Optional[int] = None,
+    cardinality_bar_size: int = 20,
+    cardinality_bar_label_size: int = 16,
+    cardinality_bar_x_axis_orient: str = "bottom",
     theme: Optional[str] = None,
 ) -> UpSetChart:
     """Generate vertical UpSet plots with set bars on top and intersection matrix below.
@@ -554,8 +559,11 @@ def UpSetVertical(
         )
 
     # Calculate dimensions
+    if cardinality_bar_width is None:
+        cardinality_bar_width = int(width * 0.15)  # 15% of total width
     set_bar_height = height * height_ratio
     matrix_height = height - set_bar_height
+    matrix_width = width - cardinality_bar_width
 
     # Setup styles
     main_color = "#3A3A3A"
@@ -567,6 +575,17 @@ def UpSetVertical(
     y_sort = alt.Sort(
         field="count" if sort_by == "frequency" else "degree", order=sort_order
     )
+
+    # Automatic bar size for cardinality bars
+    num_intersections = max(1, len(data["intersection_id"].unique().tolist()))
+    # Use 80% of available space per intersection for better visibility
+    cardinality_bar_size = min(50, (matrix_height / num_intersections) * 0.8)
+
+    # Tooltip configuration for cardinality bars
+    tooltip = [
+        alt.Tooltip("count:Q", title="Cardinality"),
+        alt.Tooltip("degree:Q", title="Degree"),
+    ]
 
     # Create base chart
     base = create_base_chart(data, sets, legend_selection, set_to_abbre, set_to_order)
@@ -601,14 +620,38 @@ def UpSetVertical(
     matrix_view = (
         (circle + rect_bg + circle_bg + line_connection + circle)
         .add_params(color_selection)
-        .properties(width=width, height=matrix_height)
+        .properties(width=matrix_width, height=matrix_height)
     )
 
-    # Combine components vertically
+    # Create cardinality bars
+    cardinality_bar, cardinality_bar_text = create_horizontal_cardinality_bar(
+        base,
+        cardinality_bar_width,
+        matrix_height,
+        main_color,
+        cardinality_bar_size,
+        brush_color,
+        y_sort,
+        tooltip,
+        cardinality_bar_label_size,
+        cardinality_bar_x_axis_orient,
+    )
+
+    cardinality_bar_chart = (
+        (cardinality_bar + cardinality_bar_text)
+        .add_params(color_selection)
+        .properties(width=cardinality_bar_width, height=matrix_height)
+    )
+
+    # Combine components vertically with cardinality bars
     upsetaltair = (
         alt.vconcat(
-            set_bar_chart,
-            matrix_view,
+            set_bar_chart.properties(width=width),
+            alt.hconcat(
+                matrix_view,
+                cardinality_bar_chart,
+                spacing=0,
+            ).resolve_scale(y="shared"),
             spacing=0,
         )
         .resolve_scale(x="shared")
