@@ -122,6 +122,11 @@
                     "tickCount": 3
                   },
                   "field": "count",
+                  "scale": {
+                    "nice": false,
+                    "padding": 0,
+                    "zero": true
+                  },
                   "title": "Intersection Size",
                   "type": "quantitative"
                 },
@@ -284,6 +289,11 @@
                     "tickCount": 3
                   },
                   "field": "count",
+                  "scale": {
+                    "nice": false,
+                    "padding": 0,
+                    "zero": true
+                  },
                   "title": "Intersection Size",
                   "type": "quantitative"
                 },
@@ -305,7 +315,7 @@
               },
               "mark": {
                 "color": "#3A3A3A",
-                "size": 36.0,
+                "size": 30,
                 "type": "bar"
               },
               "name": "view_1",
@@ -1192,6 +1202,8 @@
               },
               "field": "count",
               "scale": {
+                "nice": false,
+                "padding": 0,
                 "zero": true
               },
               "title": "Set Size",

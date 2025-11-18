@@ -165,7 +165,7 @@ def create_vertical_set_bars(
             y=alt.Y(
                 "sum(count):Q",
                 axis=alt.Axis(grid=False, tickCount=3, domain=False),
-                scale=alt.Scale(zero=True),
+                scale=alt.Scale(zero=True, padding=0, nice=False),
                 title="Set Size",
             )
         )
@@ -253,6 +253,7 @@ def create_horizontal_cardinality_bar(
         x=alt.X(
             "max(count):Q",
             axis=alt.Axis(grid=False, tickCount=3, orient=x_axis_orient),
+            scale=alt.Scale(zero=True, padding=0, nice=False),
             title="Intersection Size",
         ),
         color=brush_color,

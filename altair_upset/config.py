@@ -1,5 +1,3 @@
-
-
 def upsetaltair_top_level_configuration(
     base, legend_orient="top-left", legend_symbol_size=30
 ):

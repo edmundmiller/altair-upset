@@ -562,7 +562,7 @@ def UpSetVertical(
     if cardinality_bar_width is None:
         cardinality_bar_width = int(width * 0.15)  # 15% of total width
     set_bar_height = height * height_ratio
-    matrix_height = height - set_bar_height
+    matrix_height = height - set_bar_height  # Use full available height
     matrix_width = width - cardinality_bar_width
 
     # Setup styles
@@ -578,8 +578,7 @@ def UpSetVertical(
 
     # Automatic bar size for cardinality bars
     num_intersections = max(1, len(data["intersection_id"].unique().tolist()))
-    # Use 80% of available space per intersection for better visibility
-    cardinality_bar_size = min(50, (matrix_height / num_intersections) * 0.8)
+    cardinality_bar_size = min(30, (matrix_height / num_intersections) - 5)
 
     # Tooltip configuration for cardinality bars
     tooltip = [
