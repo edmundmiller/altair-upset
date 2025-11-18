@@ -436,7 +436,7 @@ def UpSetVertical(
     sort_order: str = "ascending",
     width: int = 1200,
     height: int = 700,
-    height_ratio: float = 0.4,
+    height_ratio: float = 0.6,
     color_range: List[str] = [
         "#55A8DB",
         "#3070B5",
@@ -450,7 +450,7 @@ def UpSetVertical(
     glyph_size: int = 100,
     set_label_bg_size: int = 500,
     line_connection_size: int = 1,
-    set_bar_size: int = 30,
+    set_bar_size: int = 20,
     cardinality_bar_width: Optional[int] = None,
     cardinality_bar_size: int = 20,
     cardinality_bar_label_size: int = 16,
@@ -480,7 +480,7 @@ def UpSetVertical(
         Total width of the plot in pixels.
     height : int, default 700
         Total height of the plot in pixels.
-    height_ratio : float, default 0.4
+    height_ratio : float, default 0.6
         Ratio of set bar height to total height.
     color_range : list of str
         List of colors for the sets.
@@ -494,7 +494,7 @@ def UpSetVertical(
         Size of the set label background circles.
     line_connection_size : int, default 1
         Thickness of connecting lines.
-    set_bar_size : int, default 30
+    set_bar_size : int, default 20
         Width of set bars in pixels.
     theme : str, optional
         Altair theme to use.
@@ -602,9 +602,12 @@ def UpSetVertical(
         main_color,
     )
 
-    set_bar_chart = (set_label_bg + set_label + set_bar).properties(
-        width=matrix_width, height=set_bar_height
-    )
+    # Separate labels from bars to prevent overlap
+    set_label_axis = (
+        (set_label_bg + set_label) if is_show_set_label_bg else set_label
+    ).properties(width=matrix_width, height=40)
+
+    set_bar_only = set_bar.properties(width=matrix_width, height=set_bar_height - 40)
 
     circle_bg, rect_bg, circle, line_connection = create_vertical_matrix(
         base,
@@ -653,13 +656,17 @@ def UpSetVertical(
     # Combine components vertically with cardinality bars
     upsetaltair = (
         alt.vconcat(
-            alt.hconcat(set_bar_chart, spacer, spacing=0),
+            alt.hconcat(
+                alt.vconcat(set_bar_only, set_label_axis, spacing=0),
+                spacer,
+                spacing=0,
+            ),
             alt.hconcat(
                 matrix_view,
                 cardinality_bar_chart,
                 spacing=0,
             ).resolve_scale(y="shared"),
-            spacing=0,
+            spacing=5,
         )
         .resolve_scale(x="shared")
         .add_params(legend_selection)

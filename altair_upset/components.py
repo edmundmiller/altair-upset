@@ -178,7 +178,7 @@ def create_vertical_set_bars(
                     offset=0,
                     titlePadding=5,
                 ),
-                scale=alt.Scale(zero=True, padding=0, nice=False),
+                scale=alt.Scale(zero=True, padding=0.1, nice=True),
                 title="Set Size",
             ),
         )
