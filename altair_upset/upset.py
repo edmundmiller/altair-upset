@@ -603,7 +603,7 @@ def UpSetVertical(
     )
 
     set_bar_chart = (set_label_bg + set_label + set_bar).properties(
-        width=width, height=set_bar_height
+        width=matrix_width, height=set_bar_height
     )
 
     circle_bg, rect_bg, circle, line_connection = create_vertical_matrix(
@@ -642,10 +642,22 @@ def UpSetVertical(
         .properties(width=cardinality_bar_width, height=matrix_height)
     )
 
+    # Create empty spacer for top-right area
+    spacer = (
+        alt.Chart(pd.DataFrame({"x": [0]}))
+        .mark_text()
+        .encode(text=alt.value(""))
+        .properties(width=cardinality_bar_width, height=set_bar_height)
+    )
+
     # Combine components vertically with cardinality bars
     upsetaltair = (
         alt.vconcat(
-            set_bar_chart.properties(width=width),
+            alt.hconcat(
+                set_bar_chart,
+                spacer,
+                spacing=0,
+            ).resolve_scale(x="shared"),
             alt.hconcat(
                 matrix_view,
                 cardinality_bar_chart,
@@ -668,7 +680,8 @@ def UpSetVertical(
             "fontWeight": 500,
             "subtitleColor": main_color,
             "subtitleFontSize": 14,
-        }
+        },
+        autosize=alt.AutoSizeParams(type="fit", resize=False, contains="padding"),
     )
 
     return UpSetChart(chart, data, sets)

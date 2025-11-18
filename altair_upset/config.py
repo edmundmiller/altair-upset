@@ -2,7 +2,7 @@ def upsetaltair_top_level_configuration(
     base, legend_orient="top-left", legend_symbol_size=30
 ):
     return (
-        base.configure_view(stroke=None)
+        base.configure_view(stroke=None, continuousHeight=300, continuousWidth=400)
         .configure_title(
             fontSize=18, fontWeight=400, anchor="start", subtitlePadding=10
         )

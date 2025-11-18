@@ -145,6 +145,7 @@ def create_vertical_set_bars(
         x=alt.X(
             "set_order:N",
             axis=alt.Axis(grid=False, labels=False, ticks=False, domain=False),
+            scale=alt.Scale(paddingInner=0, paddingOuter=0),
             title=None,
         ),
         color=alt.Color(
@@ -162,12 +163,24 @@ def create_vertical_set_bars(
         set_label_bg.mark_bar(size=set_bar_size, color=main_color)
         .transform_filter(alt.datum["is_intersect"] == 1)
         .encode(
+            x=alt.X(
+                "set_order:N",
+                axis=alt.Axis(grid=False, labels=False, ticks=False, domain=False),
+                scale=alt.Scale(paddingInner=0, paddingOuter=0),
+                title=None,
+            ),
             y=alt.Y(
                 "sum(count):Q",
-                axis=alt.Axis(grid=False, tickCount=3, domain=False),
+                axis=alt.Axis(
+                    grid=False,
+                    tickCount=3,
+                    domain=False,
+                    offset=0,
+                    titlePadding=5,
+                ),
                 scale=alt.Scale(zero=True, padding=0, nice=False),
                 title="Set Size",
-            )
+            ),
         )
     )
 
@@ -191,12 +204,14 @@ def create_vertical_matrix(
         x=alt.X(
             "set_order:N",
             axis=alt.Axis(grid=False, labels=False, ticks=False, domain=False),
+            scale=alt.Scale(paddingInner=0, paddingOuter=0),
             title=None,
         ),
         y=alt.Y(
             "intersection_id:N",
             axis=alt.Axis(grid=False, labels=False, ticks=False, domain=False),
             sort=y_sort,
+            scale=alt.Scale(paddingInner=0, paddingOuter=0),
             title=None,
         ),
         color=alt.value("#E6E6E6"),
@@ -217,9 +232,15 @@ def create_vertical_matrix(
         base.mark_bar(size=line_connection_size, color=main_color)
         .transform_filter(alt.datum["is_intersect"] == 1)
         .encode(
-            x=alt.X("min(set_order):N"),
+            x=alt.X(
+                "min(set_order):N", scale=alt.Scale(paddingInner=0, paddingOuter=0)
+            ),
             x2=alt.X2("max(set_order):N"),
-            y=alt.Y("intersection_id:N", sort=y_sort),
+            y=alt.Y(
+                "intersection_id:N",
+                sort=y_sort,
+                scale=alt.Scale(paddingInner=0, paddingOuter=0),
+            ),
         )
     )
 
@@ -248,11 +269,14 @@ def create_horizontal_cardinality_bar(
             "intersection_id:N",
             axis=alt.Axis(grid=False, labels=False, ticks=False, domain=True),
             sort=y_sort,
+            scale=alt.Scale(paddingInner=0, paddingOuter=0),
             title=None,
         ),
         x=alt.X(
             "max(count):Q",
-            axis=alt.Axis(grid=False, tickCount=3, orient=x_axis_orient),
+            axis=alt.Axis(
+                grid=False, tickCount=3, orient=x_axis_orient, offset=0, titlePadding=5
+            ),
             scale=alt.Scale(zero=True, padding=0, nice=False),
             title="Intersection Size",
         ),
