@@ -3,7 +3,13 @@ from typing import List, Literal, Optional, Union
 import altair as alt
 import pandas as pd
 
-from .components import create_horizontal_bar, create_matrix_view, create_vertical_bar
+from .components import (
+    create_horizontal_bar,
+    create_matrix_view,
+    create_vertical_bar,
+    create_vertical_matrix,
+    create_vertical_set_bars,
+)
 from .config import upsetaltair_top_level_configuration
 from .preprocessing import preprocess_data
 from .transforms import create_base_chart
@@ -126,7 +132,6 @@ def UpSetAltair(
     abbre: Optional[List[str]] = None,
     sort_by: str = "frequency",
     sort_order: str = "ascending",
-    orientation: str = "horizontal",
     width: int = 1200,
     height: int = 700,
     height_ratio: float = 0.6,
@@ -176,10 +181,6 @@ def UpSetAltair(
         - "degree": sort by number of sets in intersection
     sort_order : {"ascending", "descending"}, default "ascending"
         Order of sorting for intersections.
-    orientation : {"horizontal", "vertical"}, default "horizontal"
-        Orientation of the plot:
-        - "horizontal": cardinality bars are vertical (top), set sizes are horizontal (right)
-        - "vertical": cardinality bars are horizontal (left), set sizes are vertical (top)
     width : int, default 1200
         Total width of the plot in pixels.
     height : int, default 700
@@ -280,8 +281,6 @@ def UpSetAltair(
                 raise ValueError("highlight list must contain non-negative integers")
         else:
             raise TypeError("highlight must be None, str, int, or list of int")
-    if orientation not in ["horizontal", "vertical"]:
-        raise ValueError("orientation must be either 'horizontal' or 'vertical'")
 
     # Apply theme if specified
     if theme is not None:
@@ -356,7 +355,6 @@ def UpSetAltair(
         tooltip,
         vertical_bar_label_size,
         vertical_bar_y_axis_orient,
-        orientation,
     )
     vertical_bar_chart = (
         (vertical_bar + vertical_bar_text)
@@ -372,7 +370,6 @@ def UpSetAltair(
         brush_color,
         line_connection_size,
         main_color,
-        orientation,
     )
     matrix_view = (
         (circle + rect_bg + circle_bg + line_connection + circle)
@@ -390,51 +387,229 @@ def UpSetAltair(
             horizontal_bar_label_bg_color,
             horizontal_bar_size,
             horizontal_bar_chart_width,
-            orientation,
         )
     )
     horizontal_bar_axis = (
         (horizontal_bar_label_bg + horizontal_bar_label)
         if is_show_horizontal_bar_label_bg
         else horizontal_bar_label
+    ).properties(width=horizontal_bar_chart_width)
+
+    # Combine components
+    upsetaltair = alt.vconcat(
+        vertical_bar_chart,
+        alt.hconcat(
+            matrix_view,
+            horizontal_bar_axis,
+            horizontal_bar.properties(width=horizontal_bar_chart_width),
+            spacing=0,
+        ).resolve_scale(x="shared", y="shared"),
+        spacing=5,
+    ).add_params(legend_selection)
+
+    # Apply configuration
+    chart = upsetaltair_top_level_configuration(
+        upsetaltair, legend_orient="top", legend_symbol_size=set_label_bg_size / 2.0
     ).properties(
-        width=horizontal_bar_chart_width
-        if orientation == "horizontal"
-        else matrix_width
+        title={
+            "text": title,
+            "subtitle": subtitle,
+            "fontSize": 20,
+            "fontWeight": 500,
+            "subtitleColor": main_color,
+            "subtitleFontSize": 14,
+        }
     )
 
-    # Combine components based on orientation
-    if orientation == "horizontal":
-        # Horizontal layout: cardinality bars on top, set sizes on right
-        upsetaltair = alt.vconcat(
-            vertical_bar_chart,
-            alt.hconcat(
-                matrix_view,
-                horizontal_bar_axis,
-                horizontal_bar.properties(width=horizontal_bar_chart_width),
-                spacing=0,
-            ).resolve_scale(x="shared", y="shared"),
-            spacing=5,
-        ).add_params(legend_selection)
+    return UpSetChart(chart, data, sets)
+
+
+def UpSetVertical(
+    data: pd.DataFrame,
+    sets: List[str],
+    *,
+    title: str = "",
+    subtitle: Union[str, List[str]] = "",
+    abbre: Optional[List[str]] = None,
+    sort_by: str = "frequency",
+    sort_order: str = "ascending",
+    width: int = 1200,
+    height: int = 700,
+    height_ratio: float = 0.4,
+    color_range: List[str] = [
+        "#55A8DB",
+        "#3070B5",
+        "#30363F",
+        "#F1AD60",
+        "#DF6234",
+        "#BDC6CA",
+    ],
+    highlight_color: str = "#EA4667",
+    highlight: Optional[Union[Literal["least", "greatest"], int, List[int]]] = None,
+    glyph_size: int = 100,
+    set_label_bg_size: int = 500,
+    line_connection_size: int = 1,
+    set_bar_size: int = 30,
+    theme: Optional[str] = None,
+) -> UpSetChart:
+    """Generate vertical UpSet plots with set bars on top and intersection matrix below.
+
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        Input data where each column represents a set and contains binary
+        values (0 or 1).
+    sets : list of str
+        Names of the sets to visualize.
+    title : str, default ""
+        Title of the plot.
+    subtitle : str or list of str, default ""
+        Subtitle(s) of the plot.
+    abbre : list of str, optional
+        Abbreviations for set names.
+    sort_by : {"frequency", "degree"}, default "frequency"
+        Method to sort the intersections.
+    sort_order : {"ascending", "descending"}, default "ascending"
+        Order of sorting for intersections.
+    width : int, default 1200
+        Total width of the plot in pixels.
+    height : int, default 700
+        Total height of the plot in pixels.
+    height_ratio : float, default 0.4
+        Ratio of set bar height to total height.
+    color_range : list of str
+        List of colors for the sets.
+    highlight_color : str, default "#EA4667"
+        Color used for highlighting.
+    highlight : str, int, or list of int, optional
+        Specifies which intersections to highlight programmatically.
+    glyph_size : int, default 100
+        Size of the matrix glyphs.
+    set_label_bg_size : int, default 500
+        Size of the set label background circles.
+    line_connection_size : int, default 1
+        Thickness of connecting lines.
+    set_bar_size : int, default 30
+        Width of set bars in pixels.
+    theme : str, optional
+        Altair theme to use.
+
+    Returns
+    -------
+    UpSetChart
+        An UpSetChart object representing the vertical UpSet plot.
+    """
+    # Input validation
+    if not isinstance(data, pd.DataFrame):
+        raise TypeError("data must be a pandas DataFrame")
+    if not isinstance(sets, list) or not all(isinstance(s, str) for s in sets):
+        raise TypeError("sets must be a list of strings")
+    if not all(s in data.columns for s in sets):
+        raise ValueError("all sets must be columns in data")
+    if not all(data[s].isin([0, 1]).all() for s in sets):
+        raise ValueError("all set columns must contain only 0s and 1s")
+    if height_ratio <= 0 or height_ratio >= 1:
+        raise ValueError("height_ratio must be between 0 and 1")
+    if sort_by not in ["frequency", "degree"]:
+        raise ValueError("sort_by must be either 'frequency' or 'degree'")
+    if sort_order not in ["ascending", "descending"]:
+        raise ValueError("sort_order must be either 'ascending' or 'descending'")
+    if abbre is not None and len(sets) != len(abbre):
+        raise ValueError("if provided, abbre must have the same length as sets")
+    if highlight is not None:
+        if isinstance(highlight, str):
+            if highlight not in ["least", "greatest"]:
+                raise ValueError("highlight string must be 'least' or 'greatest'")
+        elif isinstance(highlight, int):
+            if highlight < 0:
+                raise ValueError("highlight index must be non-negative")
+        elif isinstance(highlight, list):
+            if not all(isinstance(i, int) and i >= 0 for i in highlight):
+                raise ValueError("highlight list must contain non-negative integers")
+        else:
+            raise TypeError("highlight must be None, str, int, or list of int")
+
+    # Apply theme if specified
+    if theme is not None:
+        alt.themes.enable(theme)
+
+    # Preprocess data
+    data, set_to_abbre, set_to_order, abbre = preprocess_data(
+        data, sets, abbre, sort_order
+    )
+
+    # Setup selections for interactivity
+    legend_selection = alt.selection_point(fields=["set"], bind="legend")
+
+    # Setup color selection based on highlight parameter
+    if highlight is None:
+        color_selection = alt.selection_point(
+            fields=["intersection_id"], on="mouseover"
+        )
     else:
-        # Vertical layout: cardinality bars on left, set sizes on top
-        upsetaltair = alt.hconcat(
-            vertical_bar_chart.properties(
-                width=vertical_bar_chart_height, height=matrix_height
-            ),
-            alt.vconcat(
-                alt.hconcat(
-                    horizontal_bar_axis,
-                    horizontal_bar.properties(
-                        width=matrix_width, height=horizontal_bar_chart_width
-                    ),
-                    spacing=0,
-                ).resolve_scale(x="shared", y="shared"),
-                matrix_view.properties(height=matrix_height),
-                spacing=5,
-            ),
-            spacing=5,
-        ).add_params(legend_selection)
+        highlighted_ids = _determine_highlighted_intersections(data, highlight)
+        color_selection = alt.selection_point(
+            fields=["intersection_id"],
+            value=[{"intersection_id": id_} for id_ in highlighted_ids],
+        )
+
+    # Calculate dimensions
+    set_bar_height = height * height_ratio
+    matrix_height = height - set_bar_height
+
+    # Setup styles
+    main_color = "#3A3A3A"
+    brush_color = alt.condition(
+        ~color_selection, alt.value(main_color), alt.value(highlight_color)
+    )
+    is_show_set_label_bg = len(abbre[0]) <= 2 if abbre else True
+    set_label_bg_color = "white" if is_show_set_label_bg else "black"
+    y_sort = alt.Sort(
+        field="count" if sort_by == "frequency" else "degree", order=sort_order
+    )
+
+    # Create base chart
+    base = create_base_chart(data, sets, legend_selection, set_to_abbre, set_to_order)
+
+    # Create components
+    set_label_bg, set_label, set_bar = create_vertical_set_bars(
+        base,
+        sets,
+        color_range,
+        set_label_bg_size,
+        is_show_set_label_bg,
+        set_label_bg_color,
+        set_bar_size,
+        width,
+        main_color,
+    )
+
+    set_bar_chart = (set_label_bg + set_label + set_bar).properties(
+        width=width, height=set_bar_height
+    )
+
+    circle_bg, rect_bg, circle, line_connection = create_vertical_matrix(
+        base,
+        matrix_height,
+        glyph_size,
+        y_sort,
+        brush_color,
+        line_connection_size,
+        main_color,
+    )
+
+    matrix_view = (
+        (circle + rect_bg + circle_bg + line_connection + circle)
+        .add_params(color_selection)
+        .properties(width=width, height=matrix_height)
+    )
+
+    # Combine components vertically
+    upsetaltair = alt.vconcat(
+        set_bar_chart,
+        matrix_view,
+        spacing=5,
+    ).add_params(legend_selection)
 
     # Apply configuration
     chart = upsetaltair_top_level_configuration(

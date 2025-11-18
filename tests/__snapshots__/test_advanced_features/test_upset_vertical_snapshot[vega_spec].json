@@ -1,0 +1,1229 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+  "config": {
+    "axis": {
+      "labelFontSize": 14,
+      "labelFontWeight": 300,
+      "titleFontSize": 16,
+      "titleFontWeight": 400,
+      "titlePadding": 10
+    },
+    "concat": {
+      "spacing": 0
+    },
+    "legend": {
+      "labelFontSize": 14,
+      "labelFontWeight": 300,
+      "orient": "top",
+      "padding": 20,
+      "symbolSize": 500.0,
+      "symbolType": "circle",
+      "titleFontSize": 16,
+      "titleFontWeight": 400
+    },
+    "title": {
+      "anchor": "start",
+      "fontSize": 18,
+      "fontWeight": 400,
+      "subtitlePadding": 10
+    },
+    "view": {
+      "continuousHeight": 300,
+      "continuousWidth": 400,
+      "stroke": null
+    }
+  },
+  "params": [
+    {
+      "bind": "legend",
+      "name": "param_1",
+      "select": {
+        "fields": [
+          "set"
+        ],
+        "type": "point"
+      },
+      "views": [
+        "view_1",
+        "view_0"
+      ]
+    },
+    {
+      "name": "param_0",
+      "select": {
+        "fields": [
+          "intersection_id"
+        ],
+        "on": "mouseover",
+        "type": "point"
+      },
+      "views": [
+        "view_0"
+      ]
+    }
+  ],
+  "spacing": 5,
+  "title": {
+    "fontSize": 20,
+    "fontWeight": 500,
+    "subtitle": "Set bars on top, intersection matrix below",
+    "subtitleColor": "#3A3A3A",
+    "subtitleFontSize": 14,
+    "text": "Vertical UpSet Plot"
+  },
+  "vconcat": [
+    {
+      "height": 240.0,
+      "layer": [
+        {
+          "encoding": {
+            "color": {
+              "field": "set",
+              "scale": {
+                "domain": [
+                  "A",
+                  "B",
+                  "C"
+                ],
+                "range": [
+                  "#55A8DB",
+                  "#3070B5",
+                  "#30363F",
+                  "#F1AD60",
+                  "#DF6234",
+                  "#BDC6CA"
+                ]
+              },
+              "title": null,
+              "type": "nominal"
+            },
+            "opacity": {
+              "value": 1
+            },
+            "x": {
+              "axis": {
+                "domain": false,
+                "grid": false,
+                "labels": false,
+                "ticks": false
+              },
+              "field": "set_order",
+              "title": null,
+              "type": "nominal"
+            },
+            "y": {
+              "aggregate": "sum",
+              "axis": {
+                "grid": false,
+                "tickCount": 3
+              },
+              "field": "count",
+              "title": "Set Size",
+              "type": "quantitative"
+            }
+          },
+          "mark": {
+            "color": "#3A3A3A",
+            "size": 30,
+            "type": "bar"
+          },
+          "transform": [
+            {
+              "aggregate": [
+                {
+                  "as": "count",
+                  "field": "count",
+                  "op": "sum"
+                }
+              ],
+              "groupby": [
+                "A",
+                "B",
+                "C"
+              ]
+            },
+            {
+              "as": "degree",
+              "calculate": "(isDefined(datum['A']) ? datum['A'] : 0)+(isDefined(datum['B']) ? datum['B'] : 0)+(isDefined(datum['C']) ? datum['C'] : 0)"
+            },
+            {
+              "as": [
+                "set",
+                "is_intersect"
+              ],
+              "fold": [
+                "A",
+                "B",
+                "C"
+              ]
+            },
+            {
+              "filter": "(datum['degree'] !== 0)"
+            },
+            {
+              "filter": "(datum['is_intersect'] === 1)"
+            },
+            {
+              "filter": {
+                "param": "param_1"
+              }
+            },
+            {
+              "filter": {
+                "param": "param_1"
+              }
+            },
+            {
+              "frame": [
+                null,
+                0
+              ],
+              "sort": [
+                {
+                  "field": "set_order"
+                }
+              ],
+              "window": [
+                {
+                  "as": "set_order",
+                  "field": "set",
+                  "op": "distinct"
+                }
+              ]
+            },
+            {
+              "frame": [
+                null,
+                null
+              ],
+              "window": [
+                {
+                  "as": "intersection_id",
+                  "field": "",
+                  "op": "row_number"
+                }
+              ]
+            },
+            {
+              "from": {
+                "fields": [
+                  "set_abbre"
+                ],
+                "key": "set"
+              },
+              "lookup": "set"
+            },
+            {
+              "from": {
+                "fields": [
+                  "set_order"
+                ],
+                "key": "set"
+              },
+              "lookup": "set"
+            },
+            {
+              "groupby": [
+                "intersection_id",
+                "count"
+              ],
+              "op": "max",
+              "pivot": "set",
+              "value": "is_intersect"
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "color": {
+              "field": "set",
+              "scale": {
+                "domain": [
+                  "A",
+                  "B",
+                  "C"
+                ],
+                "range": [
+                  "#55A8DB",
+                  "#3070B5",
+                  "#30363F",
+                  "#F1AD60",
+                  "#DF6234",
+                  "#BDC6CA"
+                ]
+              },
+              "title": null,
+              "type": "nominal"
+            },
+            "opacity": {
+              "value": 1
+            },
+            "x": {
+              "axis": {
+                "domain": false,
+                "grid": false,
+                "labels": false,
+                "ticks": false
+              },
+              "field": "set_order",
+              "title": null,
+              "type": "nominal"
+            }
+          },
+          "mark": {
+            "size": 500,
+            "type": "circle"
+          },
+          "name": "view_1",
+          "transform": [
+            {
+              "aggregate": [
+                {
+                  "as": "count",
+                  "field": "count",
+                  "op": "sum"
+                }
+              ],
+              "groupby": [
+                "A",
+                "B",
+                "C"
+              ]
+            },
+            {
+              "as": "degree",
+              "calculate": "(isDefined(datum['A']) ? datum['A'] : 0)+(isDefined(datum['B']) ? datum['B'] : 0)+(isDefined(datum['C']) ? datum['C'] : 0)"
+            },
+            {
+              "as": [
+                "set",
+                "is_intersect"
+              ],
+              "fold": [
+                "A",
+                "B",
+                "C"
+              ]
+            },
+            {
+              "filter": "(datum['degree'] !== 0)"
+            },
+            {
+              "filter": {
+                "param": "param_1"
+              }
+            },
+            {
+              "filter": {
+                "param": "param_1"
+              }
+            },
+            {
+              "frame": [
+                null,
+                0
+              ],
+              "sort": [
+                {
+                  "field": "set_order"
+                }
+              ],
+              "window": [
+                {
+                  "as": "set_order",
+                  "field": "set",
+                  "op": "distinct"
+                }
+              ]
+            },
+            {
+              "frame": [
+                null,
+                null
+              ],
+              "window": [
+                {
+                  "as": "intersection_id",
+                  "field": "",
+                  "op": "row_number"
+                }
+              ]
+            },
+            {
+              "from": {
+                "fields": [
+                  "set_abbre"
+                ],
+                "key": "set"
+              },
+              "lookup": "set"
+            },
+            {
+              "from": {
+                "fields": [
+                  "set_order"
+                ],
+                "key": "set"
+              },
+              "lookup": "set"
+            },
+            {
+              "groupby": [
+                "intersection_id",
+                "count"
+              ],
+              "op": "max",
+              "pivot": "set",
+              "value": "is_intersect"
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "color": {
+              "value": "white"
+            },
+            "opacity": {
+              "value": 1
+            },
+            "text": {
+              "field": "set_abbre",
+              "type": "nominal"
+            },
+            "x": {
+              "axis": {
+                "domain": false,
+                "grid": false,
+                "labels": false,
+                "ticks": false
+              },
+              "field": "set_order",
+              "title": null,
+              "type": "nominal"
+            }
+          },
+          "mark": {
+            "align": "center",
+            "type": "text"
+          },
+          "transform": [
+            {
+              "aggregate": [
+                {
+                  "as": "count",
+                  "field": "count",
+                  "op": "sum"
+                }
+              ],
+              "groupby": [
+                "A",
+                "B",
+                "C"
+              ]
+            },
+            {
+              "as": "degree",
+              "calculate": "(isDefined(datum['A']) ? datum['A'] : 0)+(isDefined(datum['B']) ? datum['B'] : 0)+(isDefined(datum['C']) ? datum['C'] : 0)"
+            },
+            {
+              "as": [
+                "set",
+                "is_intersect"
+              ],
+              "fold": [
+                "A",
+                "B",
+                "C"
+              ]
+            },
+            {
+              "filter": "(datum['degree'] !== 0)"
+            },
+            {
+              "filter": {
+                "param": "param_1"
+              }
+            },
+            {
+              "filter": {
+                "param": "param_1"
+              }
+            },
+            {
+              "frame": [
+                null,
+                0
+              ],
+              "sort": [
+                {
+                  "field": "set_order"
+                }
+              ],
+              "window": [
+                {
+                  "as": "set_order",
+                  "field": "set",
+                  "op": "distinct"
+                }
+              ]
+            },
+            {
+              "frame": [
+                null,
+                null
+              ],
+              "window": [
+                {
+                  "as": "intersection_id",
+                  "field": "",
+                  "op": "row_number"
+                }
+              ]
+            },
+            {
+              "from": {
+                "fields": [
+                  "set_abbre"
+                ],
+                "key": "set"
+              },
+              "lookup": "set"
+            },
+            {
+              "from": {
+                "fields": [
+                  "set_order"
+                ],
+                "key": "set"
+              },
+              "lookup": "set"
+            },
+            {
+              "groupby": [
+                "intersection_id",
+                "count"
+              ],
+              "op": "max",
+              "pivot": "set",
+              "value": "is_intersect"
+            }
+          ]
+        }
+      ],
+      "width": 800
+    },
+    {
+      "height": 360.0,
+      "layer": [
+        {
+          "encoding": {
+            "color": {
+              "condition": {
+                "test": {
+                  "not": {
+                    "param": "param_0"
+                  }
+                },
+                "value": "#3A3A3A"
+              },
+              "value": "#EA4667"
+            },
+            "x": {
+              "axis": {
+                "domain": false,
+                "grid": false,
+                "labels": false,
+                "ticks": false
+              },
+              "field": "set_order",
+              "title": null,
+              "type": "nominal"
+            },
+            "y": {
+              "axis": {
+                "domain": false,
+                "grid": false,
+                "labels": false,
+                "ticks": false
+              },
+              "field": "intersection_id",
+              "sort": {
+                "field": "count",
+                "order": "ascending"
+              },
+              "title": null,
+              "type": "nominal"
+            }
+          },
+          "mark": {
+            "opacity": 1,
+            "size": 100,
+            "type": "circle"
+          },
+          "name": "view_0",
+          "transform": [
+            {
+              "aggregate": [
+                {
+                  "as": "count",
+                  "field": "count",
+                  "op": "sum"
+                }
+              ],
+              "groupby": [
+                "A",
+                "B",
+                "C"
+              ]
+            },
+            {
+              "as": "degree",
+              "calculate": "(isDefined(datum['A']) ? datum['A'] : 0)+(isDefined(datum['B']) ? datum['B'] : 0)+(isDefined(datum['C']) ? datum['C'] : 0)"
+            },
+            {
+              "as": [
+                "set",
+                "is_intersect"
+              ],
+              "fold": [
+                "A",
+                "B",
+                "C"
+              ]
+            },
+            {
+              "filter": "(datum['degree'] !== 0)"
+            },
+            {
+              "filter": "(datum['is_intersect'] === 1)"
+            },
+            {
+              "filter": {
+                "param": "param_1"
+              }
+            },
+            {
+              "filter": {
+                "param": "param_1"
+              }
+            },
+            {
+              "frame": [
+                null,
+                0
+              ],
+              "sort": [
+                {
+                  "field": "set_order"
+                }
+              ],
+              "window": [
+                {
+                  "as": "set_order",
+                  "field": "set",
+                  "op": "distinct"
+                }
+              ]
+            },
+            {
+              "frame": [
+                null,
+                null
+              ],
+              "window": [
+                {
+                  "as": "intersection_id",
+                  "field": "",
+                  "op": "row_number"
+                }
+              ]
+            },
+            {
+              "from": {
+                "fields": [
+                  "set_abbre"
+                ],
+                "key": "set"
+              },
+              "lookup": "set"
+            },
+            {
+              "from": {
+                "fields": [
+                  "set_order"
+                ],
+                "key": "set"
+              },
+              "lookup": "set"
+            },
+            {
+              "groupby": [
+                "intersection_id",
+                "count"
+              ],
+              "op": "max",
+              "pivot": "set",
+              "value": "is_intersect"
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "color": {
+              "condition": {
+                "test": {
+                  "not": {
+                    "param": "param_0"
+                  }
+                },
+                "value": "#3A3A3A"
+              },
+              "value": "#EA4667"
+            },
+            "x": {
+              "axis": {
+                "domain": false,
+                "grid": false,
+                "labels": false,
+                "ticks": false
+              },
+              "field": "set_order",
+              "title": null,
+              "type": "nominal"
+            },
+            "y": {
+              "axis": {
+                "domain": false,
+                "grid": false,
+                "labels": false,
+                "ticks": false
+              },
+              "field": "intersection_id",
+              "sort": {
+                "field": "count",
+                "order": "ascending"
+              },
+              "title": null,
+              "type": "nominal"
+            }
+          },
+          "mark": {
+            "opacity": 1,
+            "size": 100,
+            "type": "circle"
+          },
+          "transform": [
+            {
+              "aggregate": [
+                {
+                  "as": "count",
+                  "field": "count",
+                  "op": "sum"
+                }
+              ],
+              "groupby": [
+                "A",
+                "B",
+                "C"
+              ]
+            },
+            {
+              "as": "degree",
+              "calculate": "(isDefined(datum['A']) ? datum['A'] : 0)+(isDefined(datum['B']) ? datum['B'] : 0)+(isDefined(datum['C']) ? datum['C'] : 0)"
+            },
+            {
+              "as": [
+                "set",
+                "is_intersect"
+              ],
+              "fold": [
+                "A",
+                "B",
+                "C"
+              ]
+            },
+            {
+              "filter": "(datum['degree'] !== 0)"
+            },
+            {
+              "filter": "(datum['is_intersect'] === 1)"
+            },
+            {
+              "filter": {
+                "param": "param_1"
+              }
+            },
+            {
+              "filter": {
+                "param": "param_1"
+              }
+            },
+            {
+              "frame": [
+                null,
+                0
+              ],
+              "sort": [
+                {
+                  "field": "set_order"
+                }
+              ],
+              "window": [
+                {
+                  "as": "set_order",
+                  "field": "set",
+                  "op": "distinct"
+                }
+              ]
+            },
+            {
+              "frame": [
+                null,
+                null
+              ],
+              "window": [
+                {
+                  "as": "intersection_id",
+                  "field": "",
+                  "op": "row_number"
+                }
+              ]
+            },
+            {
+              "from": {
+                "fields": [
+                  "set_abbre"
+                ],
+                "key": "set"
+              },
+              "lookup": "set"
+            },
+            {
+              "from": {
+                "fields": [
+                  "set_order"
+                ],
+                "key": "set"
+              },
+              "lookup": "set"
+            },
+            {
+              "groupby": [
+                "intersection_id",
+                "count"
+              ],
+              "op": "max",
+              "pivot": "set",
+              "value": "is_intersect"
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "color": {
+              "value": "#E6E6E6"
+            },
+            "x": {
+              "axis": {
+                "domain": false,
+                "grid": false,
+                "labels": false,
+                "ticks": false
+              },
+              "field": "set_order",
+              "title": null,
+              "type": "nominal"
+            },
+            "y": {
+              "axis": {
+                "domain": false,
+                "grid": false,
+                "labels": false,
+                "ticks": false
+              },
+              "field": "intersection_id",
+              "sort": {
+                "field": "count",
+                "order": "ascending"
+              },
+              "title": null,
+              "type": "nominal"
+            }
+          },
+          "mark": {
+            "opacity": 1,
+            "size": 100,
+            "type": "circle"
+          },
+          "transform": [
+            {
+              "aggregate": [
+                {
+                  "as": "count",
+                  "field": "count",
+                  "op": "sum"
+                }
+              ],
+              "groupby": [
+                "A",
+                "B",
+                "C"
+              ]
+            },
+            {
+              "as": "degree",
+              "calculate": "(isDefined(datum['A']) ? datum['A'] : 0)+(isDefined(datum['B']) ? datum['B'] : 0)+(isDefined(datum['C']) ? datum['C'] : 0)"
+            },
+            {
+              "as": [
+                "set",
+                "is_intersect"
+              ],
+              "fold": [
+                "A",
+                "B",
+                "C"
+              ]
+            },
+            {
+              "filter": "(datum['degree'] !== 0)"
+            },
+            {
+              "filter": {
+                "param": "param_1"
+              }
+            },
+            {
+              "filter": {
+                "param": "param_1"
+              }
+            },
+            {
+              "frame": [
+                null,
+                0
+              ],
+              "sort": [
+                {
+                  "field": "set_order"
+                }
+              ],
+              "window": [
+                {
+                  "as": "set_order",
+                  "field": "set",
+                  "op": "distinct"
+                }
+              ]
+            },
+            {
+              "frame": [
+                null,
+                null
+              ],
+              "window": [
+                {
+                  "as": "intersection_id",
+                  "field": "",
+                  "op": "row_number"
+                }
+              ]
+            },
+            {
+              "from": {
+                "fields": [
+                  "set_abbre"
+                ],
+                "key": "set"
+              },
+              "lookup": "set"
+            },
+            {
+              "from": {
+                "fields": [
+                  "set_order"
+                ],
+                "key": "set"
+              },
+              "lookup": "set"
+            },
+            {
+              "groupby": [
+                "intersection_id",
+                "count"
+              ],
+              "op": "max",
+              "pivot": "set",
+              "value": "is_intersect"
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "color": {
+              "value": "#F7F7F7"
+            },
+            "x": {
+              "axis": {
+                "domain": false,
+                "grid": false,
+                "labels": false,
+                "ticks": false
+              },
+              "field": "set_order",
+              "title": null,
+              "type": "nominal"
+            },
+            "y": {
+              "axis": {
+                "domain": false,
+                "grid": false,
+                "labels": false,
+                "ticks": false
+              },
+              "field": "intersection_id",
+              "sort": {
+                "field": "count",
+                "order": "ascending"
+              },
+              "title": null,
+              "type": "nominal"
+            }
+          },
+          "mark": {
+            "type": "rect"
+          },
+          "transform": [
+            {
+              "aggregate": [
+                {
+                  "as": "count",
+                  "field": "count",
+                  "op": "sum"
+                }
+              ],
+              "groupby": [
+                "A",
+                "B",
+                "C"
+              ]
+            },
+            {
+              "as": "degree",
+              "calculate": "(isDefined(datum['A']) ? datum['A'] : 0)+(isDefined(datum['B']) ? datum['B'] : 0)+(isDefined(datum['C']) ? datum['C'] : 0)"
+            },
+            {
+              "as": [
+                "set",
+                "is_intersect"
+              ],
+              "fold": [
+                "A",
+                "B",
+                "C"
+              ]
+            },
+            {
+              "filter": "((datum['set_order'] % 2) === 1)"
+            },
+            {
+              "filter": "(datum['degree'] !== 0)"
+            },
+            {
+              "filter": {
+                "param": "param_1"
+              }
+            },
+            {
+              "filter": {
+                "param": "param_1"
+              }
+            },
+            {
+              "frame": [
+                null,
+                0
+              ],
+              "sort": [
+                {
+                  "field": "set_order"
+                }
+              ],
+              "window": [
+                {
+                  "as": "set_order",
+                  "field": "set",
+                  "op": "distinct"
+                }
+              ]
+            },
+            {
+              "frame": [
+                null,
+                null
+              ],
+              "window": [
+                {
+                  "as": "intersection_id",
+                  "field": "",
+                  "op": "row_number"
+                }
+              ]
+            },
+            {
+              "from": {
+                "fields": [
+                  "set_abbre"
+                ],
+                "key": "set"
+              },
+              "lookup": "set"
+            },
+            {
+              "from": {
+                "fields": [
+                  "set_order"
+                ],
+                "key": "set"
+              },
+              "lookup": "set"
+            },
+            {
+              "groupby": [
+                "intersection_id",
+                "count"
+              ],
+              "op": "max",
+              "pivot": "set",
+              "value": "is_intersect"
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "x": {
+              "aggregate": "min",
+              "field": "set_order",
+              "type": "nominal"
+            },
+            "x2": {
+              "aggregate": "max",
+              "field": "set_order"
+            }
+          },
+          "mark": {
+            "color": "#3A3A3A",
+            "size": 1,
+            "type": "bar"
+          },
+          "transform": [
+            {
+              "aggregate": [
+                {
+                  "as": "count",
+                  "field": "count",
+                  "op": "sum"
+                }
+              ],
+              "groupby": [
+                "A",
+                "B",
+                "C"
+              ]
+            },
+            {
+              "as": "degree",
+              "calculate": "(isDefined(datum['A']) ? datum['A'] : 0)+(isDefined(datum['B']) ? datum['B'] : 0)+(isDefined(datum['C']) ? datum['C'] : 0)"
+            },
+            {
+              "as": [
+                "set",
+                "is_intersect"
+              ],
+              "fold": [
+                "A",
+                "B",
+                "C"
+              ]
+            },
+            {
+              "filter": "(datum['degree'] !== 0)"
+            },
+            {
+              "filter": "(datum['is_intersect'] === 1)"
+            },
+            {
+              "filter": {
+                "param": "param_1"
+              }
+            },
+            {
+              "filter": {
+                "param": "param_1"
+              }
+            },
+            {
+              "frame": [
+                null,
+                0
+              ],
+              "sort": [
+                {
+                  "field": "set_order"
+                }
+              ],
+              "window": [
+                {
+                  "as": "set_order",
+                  "field": "set",
+                  "op": "distinct"
+                }
+              ]
+            },
+            {
+              "frame": [
+                null,
+                null
+              ],
+              "window": [
+                {
+                  "as": "intersection_id",
+                  "field": "",
+                  "op": "row_number"
+                }
+              ]
+            },
+            {
+              "from": {
+                "fields": [
+                  "set_abbre"
+                ],
+                "key": "set"
+              },
+              "lookup": "set"
+            },
+            {
+              "from": {
+                "fields": [
+                  "set_order"
+                ],
+                "key": "set"
+              },
+              "lookup": "set"
+            },
+            {
+              "groupby": [
+                "intersection_id",
+                "count"
+              ],
+              "op": "max",
+              "pivot": "set",
+              "value": "is_intersect"
+            }
+          ]
+        }
+      ],
+      "width": 800
+    }
+  ]
+}

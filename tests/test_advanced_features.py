@@ -430,83 +430,47 @@ def test_highlight_list_indices_out_of_bounds(sample_data):
         au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], highlight=[0, 1, 999])
 
 
-def test_vertical_orientation_structure(sample_data):
-    """Test that vertical orientation creates correct chart structure."""
-    chart = au.UpSetAltair(
-        data=sample_data, sets=["A", "B", "C"], orientation="vertical"
+def test_upset_vertical_basic(sample_data):
+    """Test basic UpSetVertical creation."""
+    chart = au.UpSetVertical(data=sample_data, sets=["A", "B", "C"])
+
+    # Should create a VConcatChart (vertical concatenation)
+    assert isinstance(chart.chart, alt.VConcatChart)
+
+    # Should have two components: set bars on top, matrix below
+    assert len(chart.chart.vconcat) == 2
+
+
+def test_upset_vertical_snapshot(sample_data, output_dir, snapshot):
+    """Test vertical UpSet plot with snapshot comparison."""
+    import json
+
+    from syrupy.extensions.image import PNGImageSnapshotExtension
+    from syrupy.extensions.json import JSONSnapshotExtension
+
+    from tests.conftest import normalize_spec
+
+    chart = au.UpSetVertical(
+        data=sample_data,
+        sets=["A", "B", "C"],
+        title="Vertical UpSet Plot",
+        subtitle="Set bars on top, intersection matrix below",
+        width=800,
+        height=600,
     )
 
-    # The chart should be an HConcatChart (horizontal concatenation) for vertical orientation
-    assert isinstance(chart.chart, alt.HConcatChart)
+    # Save generated spec for debugging
+    with open(output_dir / "generated_upset_vertical.vl.json", "w") as f:
+        json.dump(chart.chart.to_dict(), f, indent=2)
 
-    # Should have cardinality bars on left and matrix/set sizes on right
-    assert len(chart.chart.hconcat) == 2
-
-
-def test_vertical_orientation_cardinality_encoding(sample_data):
-    """Test that vertical orientation swaps cardinality axes correctly."""
-    chart = au.UpSetAltair(
-        data=sample_data, sets=["A", "B", "C"], orientation="vertical"
+    # Compare normalized spec with JSON snapshot
+    assert normalize_spec(chart.chart.to_dict()) == snapshot(
+        name="vega_spec", extension_class=JSONSnapshotExtension
     )
 
-    # Get the cardinality bar chart component (first hconcat element)
-    cardinality_bar = chart.chart.hconcat[0]
-    first_layer = cardinality_bar.layer[0]
-
-    # In vertical orientation, cardinality should be on X-axis
-    encoding_dict = first_layer.encoding.to_dict()
-    assert encoding_dict["x"]["field"] == "count"
-    assert encoding_dict["y"]["field"] == "intersection_id"
-
-
-def test_vertical_orientation_set_size_encoding(sample_data):
-    """Test that vertical orientation swaps set size axes correctly."""
-    chart = au.UpSetAltair(
-        data=sample_data, sets=["A", "B", "C"], orientation="vertical"
-    )
-
-    # Get the vconcat component (right side), then the horizontal bar (top part)
-    vconcat_part = chart.chart.hconcat[1]
-    hconcat_part = vconcat_part.vconcat[0]
-    set_size_bar = hconcat_part.hconcat[-1]
-
-    # In vertical orientation, set sizes should be on Y-axis
-    encoding_dict = set_size_bar.encoding.to_dict()
-    assert encoding_dict["y"]["field"] == "count"
-    assert encoding_dict["x"]["field"] == "set_order"
-
-
-def test_vertical_orientation_matrix_encoding(sample_data):
-    """Test that vertical orientation swaps matrix axes correctly."""
-    chart = au.UpSetAltair(
-        data=sample_data, sets=["A", "B", "C"], orientation="vertical"
-    )
-
-    # Get the vconcat component (right side), then the matrix (bottom part)
-    vconcat_part = chart.chart.hconcat[1]
-    matrix_view = vconcat_part.vconcat[1]
-
-    # In vertical orientation, matrix should have X=set_order, Y=intersection_id
-    encoding_dict = matrix_view.layer[0].encoding.to_dict()
-    assert encoding_dict["x"]["field"] == "set_order"
-    assert encoding_dict["y"]["field"] == "intersection_id"
-
-
-def test_horizontal_orientation_default(sample_data):
-    """Test that default orientation is horizontal."""
-    chart_default = au.UpSetAltair(data=sample_data, sets=["A", "B", "C"])
-    chart_explicit = au.UpSetAltair(
-        data=sample_data, sets=["A", "B", "C"], orientation="horizontal"
-    )
-
-    # Both should create VConcatChart
-    assert isinstance(chart_default.chart, alt.VConcatChart)
-    assert isinstance(chart_explicit.chart, alt.VConcatChart)
-
-
-def test_orientation_invalid_value(sample_data):
-    """Test that invalid values for orientation raise ValueError."""
-    with pytest.raises(
-        ValueError, match="orientation must be either 'horizontal' or 'vertical'"
-    ):
-        au.UpSetAltair(data=sample_data, sets=["A", "B", "C"], orientation="diagonal")
+    # Save and compare image snapshot
+    chart.save(str(output_dir / "upset_vertical.png"))
+    with open(output_dir / "upset_vertical.png", "rb") as f:
+        assert f.read() == snapshot(
+            name="image", extension_class=PNGImageSnapshotExtension
+        )

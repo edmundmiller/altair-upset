@@ -258,7 +258,11 @@ def normalize_spec(spec):
                     d["param"] = param_mapping[d["param"]]
 
             # Normalize view names
-            if "name" in d and isinstance(d["name"], str) and d["name"].startswith("view_"):
+            if (
+                "name" in d
+                and isinstance(d["name"], str)
+                and d["name"].startswith("view_")
+            ):
                 if d["name"] not in view_counter:
                     view_counter[d["name"]] = f"view_{len(view_counter)}"
                 d["name"] = view_counter[d["name"]]
