@@ -20,7 +20,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Visualization",
 ]
 dependencies = [
-    "altair>=5.0.0,<6.0.0",
+    "altair>=6.0.0,<6.1.0",
     "pandas>=2.0.0,<3.0.0",
 ]
 
