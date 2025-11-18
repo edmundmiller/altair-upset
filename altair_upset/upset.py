@@ -605,11 +605,15 @@ def UpSetVertical(
     )
 
     # Combine components vertically
-    upsetaltair = alt.vconcat(
-        set_bar_chart,
-        matrix_view,
-        spacing=5,
-    ).add_params(legend_selection)
+    upsetaltair = (
+        alt.vconcat(
+            set_bar_chart,
+            matrix_view,
+            spacing=0,
+        )
+        .resolve_scale(x="shared")
+        .add_params(legend_selection)
+    )
 
     # Apply configuration
     chart = upsetaltair_top_level_configuration(

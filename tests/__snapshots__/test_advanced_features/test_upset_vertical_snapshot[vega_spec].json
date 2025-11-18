@@ -62,7 +62,12 @@
       ]
     }
   ],
-  "spacing": 5,
+  "resolve": {
+    "scale": {
+      "x": "shared"
+    }
+  },
+  "spacing": 0,
   "title": {
     "fontSize": 20,
     "fontWeight": 500,
@@ -1109,6 +1114,14 @@
             "x2": {
               "aggregate": "max",
               "field": "set_order"
+            },
+            "y": {
+              "field": "intersection_id",
+              "sort": {
+                "field": "count",
+                "order": "ascending"
+              },
+              "type": "nominal"
             }
           },
           "mark": {

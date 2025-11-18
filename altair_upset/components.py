@@ -215,7 +215,11 @@ def create_vertical_matrix(
     line_connection = (
         base.mark_bar(size=line_connection_size, color=main_color)
         .transform_filter(alt.datum["is_intersect"] == 1)
-        .encode(x=alt.X("min(set_order):N"), x2=alt.X2("max(set_order):N"))
+        .encode(
+            x=alt.X("min(set_order):N"),
+            x2=alt.X2("max(set_order):N"),
+            y=alt.Y("intersection_id:N", sort=y_sort),
+        )
     )
 
     return circle_bg, rect_bg, circle, line_connection
