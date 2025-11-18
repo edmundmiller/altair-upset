@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Fixed
+
+## [0.5.0] - 2025-11-17
+
+### Added
+
 - Programmatic highlighting via `highlight` parameter (`"least"`, `"greatest"`, index, or list of indices)
 - Vertical orientation support with new `orientation` parameter
   - Horizontal orientation (default): cardinality bars on top (vertical), set sizes on right (horizontal)
@@ -23,6 +31,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Out-of-bounds highlight indices now raise errors instead of failing silently
 - Updated component functions to support both horizontal and vertical orientations
 - Improved layout logic to handle orientation-specific rendering
+
+### Fixed
+
+- Improved vertical upset plot layout with consistent height ratios (0.6) and bar sizes (20px) matching horizontal orientation
+- Fixed set label circles being covered by bars in vertical orientation by separating labels into distinct components
+- Added proper Y-axis scale padding (0.1) to prevent matrix dots from being hidden behind set bars
+- Added 5px spacing between vertical plot components for better visual separation
 
 ## [0.4.0] - 2025-01-20
 
