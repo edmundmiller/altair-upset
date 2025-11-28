@@ -57,13 +57,11 @@ You can use altair-upset with either Pandas or Polars DataFrames:
     })
 
     # Create an UpSet plot
-    chart = au.UpSetAltair(
+    au.UpSetAltair(
         data=data,
         sets=["set1", "set2", "set3"],
         title="Sample UpSet Plot"
     ).chart
-
-    chart
 
 For Polars usage and more advanced examples, check out the
 :doc:`examples/polars_example` in our example gallery.
