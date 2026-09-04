@@ -21,7 +21,7 @@ classifiers = [
 ]
 dependencies = [
     "altair>=5.0.0,<6.0.0",
-    "pandas>=2.0.0,<3.0.0",
+    "pandas>=3.0.5,<3.1.0",
 ]
 
 [project.urls]
